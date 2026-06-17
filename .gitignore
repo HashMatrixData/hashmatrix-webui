@@ -13,3 +13,11 @@ __pycache__/
 .venv/
 .env
 *.local
+
+# 前端工程产物
+storybook-static/
+coverage/
+*.tsbuildinfo
+playwright-report/
+test-results/
+.eslintcache

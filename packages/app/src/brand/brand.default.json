@@ -1,0 +1,12 @@
+{
+  "appName": "HashMatrix",
+  "companyName": "Acme Demo Tech",
+  "logo": {
+    "light": "/brand/logo-light.svg",
+    "dark": "/brand/logo-dark.svg",
+    "favicon": "/brand/favicon.svg"
+  },
+  "colorPrimary": "#1668dc",
+  "colorSecondary": "#13c2c2",
+  "fontFamily": ""
+}

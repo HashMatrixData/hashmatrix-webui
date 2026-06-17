@@ -1,0 +1,28 @@
+{
+  "name": "hashmatrix-webui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "hashmatrix 数据中台统一前端控制台（WebUI / 数据大屏 / 可视化编排）",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
+  },
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "dev": "pnpm --filter @hashmatrix/app dev",
+    "build": "pnpm --filter @hashmatrix/app build",
+    "preview": "pnpm --filter @hashmatrix/app preview",
+    "lint": "pnpm --filter @hashmatrix/app lint",
+    "typecheck": "pnpm --filter @hashmatrix/app typecheck",
+    "test": "pnpm --filter @hashmatrix/app test",
+    "storybook": "pnpm --filter @hashmatrix/app storybook",
+    "build-storybook": "pnpm --filter @hashmatrix/app build-storybook",
+    "test-storybook": "pnpm --filter @hashmatrix/app test-storybook",
+    "format": "prettier --write \"packages/**/*.{ts,tsx,css,json,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  }
+}
