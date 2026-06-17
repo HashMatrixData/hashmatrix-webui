@@ -5,13 +5,26 @@
 
 ## 0. 目标与范围
 
-数据治理 / 数据中台的**全站统一前端控制台**（含 WebUI、数据大屏、可视化编排前端）。WebUI 是本平台**唯一前端工程**——其余 submodule（governance / security / tools-bi / privacy / data-foundation / gateway / platform-common）均为无界面后端服务。本轮只做**技术选型 + 初始化脚手架**，不实现业务功能。
+数据治理 / 数据中台的**全站统一前端**。WebUI 是本平台**唯一前端仓**——其余 submodule（governance / security / tools-bi / privacy / data-foundation / gateway / platform-common）均为无界面后端服务。本轮只做**技术选型 + 初始化脚手架**，不实现业务功能。
+
+### 双平面（同仓双 app）
+
+平台有两类前端面向，**同一 monorepo 内拆为两个 app 目标 + 共享 packages**（不是两个 git 仓）：
+
+| App | 平面 | 受众 / 身份 | 对接后端 | 品牌 | 拓扑 |
+|-----|------|-----------|---------|------|------|
+| `apps/console` | **使用平面** · 租户控制台 | 租户用户（JWT 带 `tenant`，**org 作用域**） | governance / security / tools-bi / privacy / data-foundation | 部署级白标 | per-tenant / 按 org 多租户 |
+| `apps/admin` | **管理平面** · 运营控制台 | 平台运营方（**跨租户** superadmin，不绑租户） | 主要 `control-plane` | 部署级（SaaS=我们品牌 / 私有化=客户品牌） | **跨租户单例**，独立域名 |
+
+- **为何拆两个 app**：受众与身份不同（租户用户 vs 跨租户运营方）、拓扑不同（per-tenant vs 单例）、**安全爆炸半径**不同——admin 含「开通/销毁租户、改配额、看全租户」高权限操作，其 bundle **绝不能与租户用户同包**。两个 app 各自构建产物 → 两个 Nginx 镜像 / 两个域名，互不可达。
+- **为何同仓不拆仓**：设计系统、白标引擎、SDK（由 contracts 生成）、i18n、构建工具链全部经 `packages/*` 共享，避免复制、保设计一致、维护成本最低；已定的 pnpm 单体正为此准备。将来 admin 若需更强代码访问隔离再抽仓，共享 packages 保留。
+- **「租户自管理」不是第三个 app**：一个租户管自己的成员 / 配额视图，是 `apps/console` 内**按角色门控的区段**，属于使用平面；与跨租户的运营管理平面（`apps/admin`）严格区分。
 
 ### 三条硬约束
 
-1. **品牌可配置化（白标 / OEM）**：Logo / 主色 / 辅色 / 品牌名 / 企业名低成本替换，配置驱动，运行期免重建换肤。
-2. **i18n + light/dark**：从架构起就纳入。
-3. **画布能力**：数据治理画布（血缘 / DAG 编排 / ER / 大屏）为核心竞争力，原生自研。
+1. **品牌可配置化（白标 / OEM）**：Logo / 主色 / 辅色 / 品牌名 / 企业名低成本替换，配置驱动，运行期免重建换肤。两 app 共用同一套白标引擎。
+2. **i18n + light/dark**：从架构起就纳入，两 app 共享。
+3. **画布能力**：数据治理画布（血缘 / DAG 编排 / ER / 大屏）为核心竞争力，原生自研（主要在 `apps/console`）。
 
 ---
 
@@ -21,7 +34,7 @@
 |------|------|
 | 语言 | **TypeScript（strict）** |
 | 框架 | **React 19** |
-| 构建/形态 | **Vite SPA 单应用**（控制台 + 大屏同一应用，无 SSR） |
+| 构建/形态 | **Vite SPA**（无 SSR）· **pnpm monorepo 双 app**：`apps/console`（使用平面）+ `apps/admin`（管理平面），共享 `packages/*` |
 | UI 库 | **Ant Design v6 + ProComponents**（ProLayout / ProTable / ProForm） |
 | 画布 | **AntV X6**（DAG 编排 / ER）+ **AntV G6**（血缘 / 关系图谱）+ **G2**（图表）+ **S2**（透视表/数据预览） |
 | i18n | **react-i18next** + AntD `locale`；zh-CN 为源 + en-US；含日期/数字/时区本地化 |
@@ -44,7 +57,8 @@
 | # | 决策 | 选定 | 备注 |
 |---|------|------|------|
 | D1 | 框架 | React 19 | AntD v6 token 换肤最成熟 + 画布生态最全 |
-| D2 | 运行形态 | Vite SPA 单应用 | 内部鉴权控制台 + 大屏同应用，无 SSR 刚需 |
+| D2 | 运行形态 | Vite SPA，无 SSR 刚需 | 内部鉴权控制台 + 大屏 |
+| D2b | 前端平面 | **同仓双 app**：`console`（使用平面）+ `admin`（管理平面） | 受众/拓扑/安全爆炸半径不同 → 分 app 分产物分域名；设计系统/白标/SDK/i18n 经 `packages/*` 共享，不拆仓 |
 | D3 | 白标交付 | **构建期默认 + 运行期覆盖** | 一份镜像多处部署，改 `config.js` 即换肤免重建 |
 | D4 | 画布范围 v1 | 血缘 / DAG / ER / 大屏**全部原生自研** | **上游做引擎/API，画布 UI 全自研** |
 | D5 | 集成策略 | **混合：核心自研 + 重型集成** | 见下方集成矩阵 |
@@ -106,32 +120,49 @@
 hashmatrix-webui/
 ├─ pnpm-workspace.yaml
 ├─ package.json
-├─ packages/
-│  └─ app/                          # 主控制台 SPA
+├─ apps/
+│  ├─ console/                       # 使用平面 · 租户控制台 SPA（业务主体）
+│  │  ├─ index.html
+│  │  ├─ vite.config.ts              # build target 降级以兼容国产旧内核
+│  │  ├─ .storybook/                 # Storybook(Vite builder) + test-runner 配置
+│  │  ├─ public/
+│  │  │  ├─ config.js                # 运行期 window.__CONFIG__ (brand/api/oidc)
+│  │  │  └─ brand/                   # logo/favicon 资源槽位
+│  │  ├─ src/
+│  │  │  ├─ main.tsx
+│  │  │  ├─ app/                     # Provider 装配 + 路由
+│  │  │  ├─ auth/                    # Keycloak OIDC（org 作用域）+ 路由守卫
+│  │  │  ├─ layout/                  # ProLayout 壳(导航 + 品牌位 + 语言/明暗/租户切换)
+│  │  │  ├─ canvas/                  # X6/G6 封装(lineage/dag/er) + 大屏 scale 容器
+│  │  │  ├─ modules/                 # feature 模块(governance/security/data-foundation 自研)
+│  │  │  ├─ integration/             # 第三方集成(iframe+SSO 品牌化外框: bi/privacy)
+│  │  │  ├─ admin/                   # 「租户自管理」按角色门控区段（非跨租户运营台）
+│  │  │  ├─ mocks/                   # msw handlers，供 story / E2E 自含数据
+│  │  │  └─ routes/
+│  │  └─ tests/                      # vitest(单测) + playwright(跑在 Storybook 之上)
+│  └─ admin/                         # 管理平面 · 运营控制台 SPA（跨租户单例，独立域名）
 │     ├─ index.html
-│     ├─ vite.config.ts             # build target 降级以兼容国产旧内核
-│     ├─ .storybook/                # Storybook(Vite builder) + test-runner 配置
-│     ├─ public/
-│     │  ├─ config.js               # 运行期 window.__CONFIG__ (brand/api/oidc)
-│     │  └─ brand/                  # logo/favicon 资源槽位
+│     ├─ vite.config.ts
+│     ├─ .storybook/
+│     ├─ public/config.js            # 运行期注入（admin API/OIDC，品牌同部署级）
 │     ├─ src/
 │     │  ├─ main.tsx
-│     │  ├─ app/                    # Provider 装配 + 路由
-│     │  ├─ brand/                  # 白标引擎: config → token/CSS var/i18n/资源
-│     │  ├─ theme/                  # AntD algorithm + 明暗 + CSS Vars
-│     │  ├─ i18n/                   # react-i18next, zh-CN/en-US 命名空间
-│     │  ├─ auth/                   # Keycloak OIDC + 路由守卫
-│     │  ├─ layout/                 # ProLayout 壳(导航 + 品牌位 + 语言/明暗/租户切换)
-│     │  ├─ canvas/                 # X6/G6 封装(lineage/dag/er) + 大屏 scale 容器
-│     │  ├─ modules/               # feature 模块(governance/security/data-foundation 自研)
-│     │  ├─ integration/           # 第三方集成(iframe+SSO 品牌化外框: bi/privacy)
-│     │  ├─ shared/                # 组件/hooks/请求封装/权限(路由级+按钮级)；组件同级放 *.stories.tsx
-│     │  ├─ mocks/                 # msw handlers，供 story / E2E 自含数据
-│     │  └─ routes/
-│     └─ tests/                     # vitest(单测) + playwright(跑在 Storybook 之上)
-├─ deploy/                          # Dockerfile + nginx.conf + config.js 模板
+│     │  ├─ app/                     # Provider 装配 + 路由
+│     │  ├─ auth/                    # Keycloak OIDC（跨租户 superadmin 角色，不绑 org）
+│     │  ├─ layout/                  # ProLayout 壳
+│     │  └─ modules/                 # 租户目录/注册审批/开通状态/配额/生命周期（对接 control-plane）
+│     └─ tests/
+├─ packages/                         # ↓ 两 app 共享，避免复制
+│  ├─ ui/                            # 设计系统：ProComponents 封装 + AntV 画布组件
+│  ├─ brand/                         # 白标引擎：config → token/CSS var/i18n/资源（四路分发）
+│  ├─ theme/                         # AntD algorithm + 明暗 + CSS Vars
+│  ├─ i18n/                          # react-i18next，zh-CN/en-US 命名空间
+│  └─ sdk/                           # API 客户端（由主仓 contracts 生成）+ 请求封装/权限
+├─ deploy/                           # 每 app 一套 Dockerfile + nginx.conf + config.js 模板
 └─ docs/
 ```
+
+> `apps/console` 先行（Issue #1），`apps/admin` 在其完成后增量接入（Issue #2）；共享逻辑随 admin 接入逐步从 console 上提到 `packages/*`。
 
 ---
 
@@ -147,6 +178,12 @@ hashmatrix-webui/
 8. **E2E**：`@storybook/test-runner`（Playwright）跑在 Storybook 之上，story 即夹具，免备后端环境。
 9. CI：lint + Vitest + Storybook 构建 + Playwright(基于 Storybook) E2E + build；`deploy/`（Dockerfile + nginx + `config.js` 模板）。
 10. 更新 README / CLAUDE.md 技术栈段；提交推送；记忆落档。
+
+> **分两阶段交付**：上述 1–10 聚焦 `apps/console`（使用平面，Issue #1）。`apps/admin`（管理平面，Issue #2）在 #1 完成后增量接入：
+> 11. 以 `apps/console` 为模板新增 `apps/admin`（独立入口/构建产物/域名），复用 `packages/*`（ui/brand/theme/i18n/sdk），不复制白标与设计系统。
+> 12. admin 鉴权切到**跨租户 superadmin 角色**（不绑 org），路由守卫与 console 区分。
+> 13. admin 首屏对接 `control-plane`：租户目录 / 注册审批 / 开通状态 / 配额 / 生命周期（先 mock，后接真实 API）。
+> 14. `deploy/` 增加 admin 独立 Dockerfile + nginx + `config.js`；CI 矩阵覆盖两 app。
 
 ## 7. 暂缓 / 后续专项（已记录，不入 v1）
 
