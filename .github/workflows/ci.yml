@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    name: lint · typecheck · unit · build · storybook · e2e
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # pnpm 版本取自 package.json 的 packageManager 字段（不再在此重复指定，避免 action-setup 报版本冲突）。
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Unit tests (Vitest)
+        run: pnpm test
+
+      - name: Build (Vite, 信创降级 target)
+        run: pnpm build
+
+      - name: Build Storybook
+        run: pnpm build-storybook
+
+      - name: Install Playwright browser
+        run: pnpm --filter @hashmatrix/app exec playwright install --with-deps chromium
+
+      - name: E2E (Playwright on Storybook)
+        run: pnpm --filter @hashmatrix/app test-storybook:ci

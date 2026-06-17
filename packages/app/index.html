@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/brand/favicon.svg" id="favicon" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 运行期注入：window.__CONFIG__（brand / api / oidc）。部署期由容器 env 渲染覆盖。 -->
+    <script src="/config.js"></script>
+    <title>HashMatrix 控制台</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
