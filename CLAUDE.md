@@ -36,10 +36,29 @@
 
 **本仓视角（webui）**：前端品牌经部署期 `config.js` 注入（公网=我们品牌 / 私有化=客户品牌），**绝不按租户在运行期换肤**；一个部署内登录页与界面风格统一。UI 始终运行在某租户上下文下，组件与请求都带租户维度。
 
-> 全局定义见主仓 `docs/00-主仓初始化-spec.md` 与 `docs/architecture/05-多租户与控制平面.md`。
+### 🧭 北极星结构：同仓双 app（本仓特有 · 时刻谨记）
+
+本仓是平台**唯一前端仓**，但**不是单一应用**。控制平面（`control-plane`）引入后，前端按面向拆为**两个 app 目标 + 共享 `packages/*`**，**同一 monorepo，不拆仓**：
+
+| App | 平面 | 受众 / 身份 | 对接后端 | 拓扑 |
+|--|--|--|--|--|
+| `apps/console` | **使用平面** · 租户控制台 | 租户用户（JWT 带 `tenant`，**org 作用域**） | governance / security / tools-bi / privacy / data-foundation | per-tenant / 按 org 多租户 |
+| `apps/admin` | **管理平面** · 运营控制台 | 平台运营方（**跨租户 superadmin**，不绑 org） | 主要 `control-plane` | **跨租户单例**，独立域名 |
+
+开发须遵守的硬规则：
+
+- **安全爆炸半径优先**：`apps/admin` 含「开通 / 销毁租户、改配额、看全租户」高权限操作，其代码与 bundle **绝不可与租户用户同包**。两 app 各自构建产物、独立域名、互不可达——禁止把 admin 模块塞进 console 或共享路由。
+- **共享靠 `packages/*`、不靠复制**：设计系统（`ui`）、白标引擎（`brand`）、主题（`theme`）、i18n、SDK（`sdk`，由主仓 `contracts` 生成）经 packages 共享，两 app 共用。新增能力先想"放 console、放 admin、还是上提 packages"。
+- **「租户自管理」≠ admin**：一个租户管自己的成员 / 配额视图，是 `apps/console` 内**按角色门控的区段**，属于使用平面；跨租户运营才进 `apps/admin`。两者严禁混淆。
+- **白标两 app 一致**：admin 同样走部署级 `config.js`（SaaS=我们品牌 / 私有化=客户品牌），**不按租户换肤**。
+- **交付分两阶段**：console=Issue #1（实现中）；admin=Issue #3（#1 完成后增量，共享逻辑上提 `packages/*`）。
+
+> 任何前端变更先确认它属于哪个平面、是否触碰分包隔离与共享边界。
+
+> 全局定义见主仓 `docs/00-主仓初始化-spec.md` 与 `docs/architecture/05-多租户与控制平面.md`；本仓落地见 `docs/00-前端初始化-spec.md`（§0 双平面、§5 目录）。
 
 ## 仓库定位
 
-前端子模块：WebUI、数据大屏、可视化编排前端。框架（Next.js / Vue3）待定。
+平台**唯一前端仓**（其余 submodule 均为无界面后端服务）：使用平面控制台 + 数据大屏 + 可视化编排画布（`apps/console`）+ 管理平面运营控制台（`apps/admin`）。
 
-技术栈与具体选型**待独立讨论后逐步丰富**，当前为初始脚手架。
+技术栈**已定稿**（详见 `docs/00-前端初始化-spec.md`）：React 19 + TS(strict) + Vite SPA · **pnpm monorepo 双 app** · Ant Design v6 + ProComponents · AntV(X6/G6/G2/S2) · react-i18next · TanStack Query + Zustand · Keycloak OIDC · Storybook + Playwright(基于 Storybook) + Vitest。当前处脚手架阶段。
