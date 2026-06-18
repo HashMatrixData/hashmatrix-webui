@@ -3,4 +3,4 @@
 **/storybook-static
 **/coverage
 **/pnpm-lock.yaml
-packages/app/public/mockServiceWorker.js
+**/public/mockServiceWorker.js

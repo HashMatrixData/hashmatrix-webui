@@ -1,4 +1,5 @@
 packages:
+  - 'apps/*'
   - 'packages/*'
 allowBuilds:
   '@swc/core': true
@@ -9,6 +10,9 @@ allowBuilds:
 # 强制全仓 antd 收敛 v6，并放行该 peer 版本以消除告警。运行期兼容由 typecheck + E2E 把关。
 overrides:
   antd: ^6.4.4
+  # 全仓收敛单一 React 实例（内部源包以 dependencies 声明 react，靠此保证去重、杜绝双实例 hooks 风险）。
+  react: ^19.2.7
+  react-dom: ^19.2.7
 peerDependencyRules:
   allowedVersions:
     antd: '6'

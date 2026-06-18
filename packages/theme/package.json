@@ -1,0 +1,22 @@
+{
+  "name": "@hashmatrix/theme",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AntD algorithm + 明暗 + ConfigProvider 装配（白标 token/locale 汇合）。两 app 共享。",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@hashmatrix/brand": "workspace:*",
+    "@hashmatrix/i18n": "workspace:*",
+    "antd": "^6.4.4",
+    "react": "^19.2.7",
+    "react-i18next": "^17.0.8",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17"
+  }
+}

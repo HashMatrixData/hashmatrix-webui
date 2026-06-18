@@ -1,0 +1,29 @@
+{
+  "name": "@hashmatrix/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "设计系统：通用控件（语言/明暗/换肤/角色）+ AntV 画布组件（血缘/DAG/大屏）+ 共享 hooks。两 app 共享。",
+  "exports": {
+    ".": "./src/index.ts",
+    "./controls": "./src/controls/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@ant-design/icons": "^6.2.5",
+    "@antv/g2": "^5.4.8",
+    "@antv/g6": "^5.1.1",
+    "@antv/x6": "^3.1.7",
+    "@hashmatrix/brand": "workspace:*",
+    "@hashmatrix/i18n": "workspace:*",
+    "@hashmatrix/sdk": "workspace:*",
+    "@hashmatrix/theme": "workspace:*",
+    "antd": "^6.4.4",
+    "react": "^19.2.7",
+    "react-i18next": "^17.0.8"
+  },
+  "devDependencies": {
+    "@storybook/react-vite": "^10.4.6",
+    "@types/react": "^19.2.17"
+  }
+}
