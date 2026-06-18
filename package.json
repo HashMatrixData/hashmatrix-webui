@@ -12,14 +12,15 @@
   "packageManager": "pnpm@11.7.0",
   "scripts": {
     "dev": "pnpm --filter @hashmatrix/console dev",
-    "build": "pnpm --filter @hashmatrix/console build",
+    "dev:admin": "pnpm --filter @hashmatrix/admin dev",
+    "build": "pnpm --filter \"./apps/*\" build",
     "preview": "pnpm --filter @hashmatrix/console preview",
     "lint": "eslint .",
-    "typecheck": "pnpm --filter @hashmatrix/console typecheck",
-    "test": "pnpm --filter @hashmatrix/console test",
+    "typecheck": "pnpm --filter \"./apps/*\" typecheck",
+    "test": "pnpm --filter \"./apps/*\" test",
     "storybook": "pnpm --filter @hashmatrix/console storybook",
-    "build-storybook": "pnpm --filter @hashmatrix/console build-storybook",
-    "test-storybook": "pnpm --filter @hashmatrix/console test-storybook",
+    "storybook:admin": "pnpm --filter @hashmatrix/admin storybook",
+    "build-storybook": "pnpm --filter \"./apps/*\" build-storybook",
     "format": "prettier --write \"{apps,packages}/**/*.{ts,tsx,css,json,md}\""
   },
   "devDependencies": {

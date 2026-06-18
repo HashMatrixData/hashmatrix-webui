@@ -27,3 +27,16 @@ export const useMockSessionStore = create<MockSessionState>((set) => ({
   signOut: () => set({ signedIn: false }),
   setRoles: (roles) => set({ roles }),
 }));
+
+/**
+ * 各 app 启动时调用一次（render 前），为 mock 会话注入该平面的身份与角色。
+ * console=租户用户角色；admin=跨租户 superadmin。真实 OIDC 下角色来自 token，与此无关。
+ */
+export function configureMockSession(seed: { name: string; email?: string; roles: string[] }): void {
+  useMockSessionStore.setState({
+    signedIn: true,
+    name: seed.name,
+    email: seed.email ?? '',
+    roles: seed.roles,
+  });
+}

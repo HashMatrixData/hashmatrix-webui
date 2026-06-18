@@ -1,0 +1,19 @@
+// 管理平面运行期配置模板——容器启动由 envsubst 渲染为 /usr/share/nginx/html/config.js。
+// 品牌部署级（与 console 同源，不按租户换肤）；对接 control-plane；OIDC 用 superadmin client。
+// 红线：默认值脱敏占位（example.com），真实参数经部署环境变量注入。
+window.__CONFIG__ = {
+  brand: {
+    appName: "${BRAND_APP_NAME}",
+    companyName: "${BRAND_COMPANY_NAME}",
+    colorPrimary: "${BRAND_COLOR_PRIMARY}",
+    colorSecondary: "${BRAND_COLOR_SECONDARY}"
+  },
+  api: {
+    baseUrl: "${API_BASE_URL}"
+  },
+  oidc: {
+    authority: "${OIDC_AUTHORITY}",
+    clientId: "${OIDC_CLIENT_ID}",
+    scope: "${OIDC_SCOPE}"
+  }
+};

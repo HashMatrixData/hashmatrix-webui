@@ -2,27 +2,22 @@
 import { useEffect, type ReactNode } from 'react';
 import type { Preview } from '@storybook/react-vite';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import '@/index.css';
 import i18n from '@/i18n';
 import { bootstrapBrand } from '@hashmatrix/brand';
+import { configureMockSession, MockSessionProvider, ROLES } from '@hashmatrix/sdk';
 import { useThemeStore, AppConfigProvider, type ThemeMode } from '@hashmatrix/theme';
-import { MockSessionProvider } from '@hashmatrix/sdk';
 import { handlers } from '@/mocks/handlers';
+import { queryClient } from '@/app/queryClient';
 
-// msw：story 自含 mock 数据（worker 文件由 public/mockServiceWorker.js 提供）。
 initialize({ onUnhandledRequest: 'bypass' }, handlers);
 bootstrapBrand();
+// admin 故事以 superadmin 身份渲染。
+configureMockSession({ name: 'Ops Admin', email: 'ops.admin@example.com', roles: [ROLES.SUPERADMIN] });
 
-function StoryProviders({
-  theme,
-  locale,
-  children,
-}: {
-  theme: ThemeMode;
-  locale: string;
-  children: ReactNode;
-}) {
+function StoryProviders({ theme, locale, children }: { theme: ThemeMode; locale: string; children: ReactNode }) {
   const setMode = useThemeStore((s) => s.setMode);
   useEffect(() => {
     setMode(theme);
@@ -33,24 +28,21 @@ function StoryProviders({
 
   return (
     <MemoryRouter>
-      <MockSessionProvider>
-        <AppConfigProvider>
-          <div style={{ padding: 16 }}>{children}</div>
-        </AppConfigProvider>
-      </MockSessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <MockSessionProvider>
+          <AppConfigProvider>
+            <div style={{ padding: 16 }}>{children}</div>
+          </AppConfigProvider>
+        </MockSessionProvider>
+      </QueryClientProvider>
     </MemoryRouter>
   );
 }
 
 const preview: Preview = {
-  parameters: {
-    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
-  },
+  parameters: { controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } } },
   loaders: [mswLoader],
-  initialGlobals: {
-    theme: 'light',
-    locale: 'zh-CN',
-  },
+  initialGlobals: { theme: 'light', locale: 'zh-CN' },
   globalTypes: {
     theme: {
       description: '明暗主题',

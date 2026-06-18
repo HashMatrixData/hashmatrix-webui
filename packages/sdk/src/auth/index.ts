@@ -6,5 +6,5 @@ export { PermissionGuard } from './PermissionGuard';
 export { RequireAuth, RequireRole } from './guards';
 export { LoginScreen } from './LoginScreen';
 export { AppAuthProvider } from './AppAuthProvider';
-export { useMockSessionStore } from './mockSessionStore';
+export { useMockSessionStore, configureMockSession } from './mockSessionStore';
 export { isOidcEnabled } from './oidcConfig';

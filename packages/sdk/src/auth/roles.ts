@@ -8,6 +8,8 @@ export const ROLES = {
   ADMIN: 'admin',
   GOVERNANCE_EDITOR: 'governance:editor',
   VIEWER: 'viewer',
+  /** 跨租户运营方（管理平面 apps/admin）：不绑 org，最高权限。 */
+  SUPERADMIN: 'superadmin',
 } as const;
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];

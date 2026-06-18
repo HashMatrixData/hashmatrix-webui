@@ -2,7 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom';
 import './index.css';
-import '@hashmatrix/i18n'; // 初始化 i18next（副作用）
+import '@/i18n'; // 初始化 i18next（console 资源叠加在共享基线之上，副作用）
 import { bootstrapBrand } from '@hashmatrix/brand';
 import { AppProviders } from '@/app/AppProviders';
 import { router } from '@/app/router';

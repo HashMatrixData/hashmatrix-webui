@@ -1,39 +1,12 @@
-import type { Resources } from './zh-CN';
+import type { ConsoleResources } from './zh-CN';
 
-const enUS: Resources = {
-  common: {
-    loading: 'Loading…',
-    confirm: 'OK',
-    cancel: 'Cancel',
-    save: 'Save',
-    poweredBy: 'Powered by {{companyName}}',
-  },
-  language: {
-    label: 'Language',
-    'zh-CN': '简体中文',
-    'en-US': 'English',
-  },
-  theme: {
-    label: 'Theme',
-    light: 'Light',
-    dark: 'Dark',
-    skin: 'Skin',
-  },
+const consoleEnUS: ConsoleResources = {
   menu: {
     dashboard: 'Dashboard',
     lineage: 'Data Lineage',
     orchestration: 'DAG Orchestration',
     playground: 'Three-Switch Demo',
     governance: 'Data Governance',
-  },
-  brand: {
-    preset: {
-      label: 'Brand theme',
-      default: 'Default Blue',
-      violet: 'Violet',
-      forest: 'Forest',
-      sunset: 'Sunset',
-    },
   },
   demo: {
     title: 'Three-Switch Demo',
@@ -63,18 +36,6 @@ const enUS: Resources = {
     colQuality: 'Quality',
     syncAdmin: 'Sync metadata (admin)',
   },
-  auth: {
-    signIn: 'Sign in',
-    signOut: 'Sign out',
-    signingIn: 'Redirecting to sign in…',
-    signedInAs: 'Signed in as {{name}}',
-    unauthorized: 'Not authorized',
-    unauthorizedDesc: 'This account lacks the role required to view this page.',
-    loginRequired: 'Please sign in to access the console.',
-    misconfiguredTitle: 'Authentication not configured',
-    misconfiguredDesc:
-      'Production deployment must inject oidc.authority at runtime via config.js (see deploy/README.md). No access is granted when unconfigured.',
-  },
   lineage: {
     focusNote:
       'The focused node (dws.agg_daily) uses the brand accent for its border; structural colors are fixed. Drag / zoom the canvas.',
@@ -90,4 +51,4 @@ const enUS: Resources = {
   },
 };
 
-export default enUS;
+export default consoleEnUS;

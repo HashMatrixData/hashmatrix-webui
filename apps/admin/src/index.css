@@ -1,0 +1,21 @@
+:root {
+  /* 白标 CSS Vars 默认值（运行期由白标引擎覆盖到 :root）。与 console 同一套引擎。 */
+  --brand-primary: #1668dc;
+  --brand-secondary: #13c2c2;
+  --brand-font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Source Han Sans SC',
+    'Noto Sans CJK SC', Arial, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--brand-font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

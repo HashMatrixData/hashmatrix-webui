@@ -1,0 +1,6 @@
+<!-- Storybook iframe 不加载 app 的 index.html，故在此注入运行期配置，
+     使共享 sdk 的 http baseURL 解析为 control-plane（msw handlers 据此拦截）。
+     在 preview 模块之前执行，保证 http 创建时即可读到。 -->
+<script>
+  window.__CONFIG__ = { api: { baseUrl: '/control-plane' } };
+</script>
