@@ -162,7 +162,7 @@ hashmatrix-webui/
 └─ docs/
 ```
 
-> `apps/console` 先行（Issue #1），`apps/admin` 在其完成后增量接入（Issue #2）；共享逻辑随 admin 接入逐步从 console 上提到 `packages/*`。
+> `apps/console` 先行（Issue #1），`apps/admin` 在其完成后增量接入（Issue #3）；共享逻辑随 admin 接入逐步从 console 上提到 `packages/*`。
 
 ---
 
@@ -179,7 +179,7 @@ hashmatrix-webui/
 9. CI：lint + Vitest + Storybook 构建 + Playwright(基于 Storybook) E2E + build；`deploy/`（Dockerfile + nginx + `config.js` 模板）。
 10. 更新 README / CLAUDE.md 技术栈段；提交推送；记忆落档。
 
-> **分两阶段交付**：上述 1–10 聚焦 `apps/console`（使用平面，Issue #1）。`apps/admin`（管理平面，Issue #2）在 #1 完成后增量接入：
+> **分两阶段交付**：上述 1–10 聚焦 `apps/console`（使用平面，Issue #1）。`apps/admin`（管理平面，Issue #3）在 #1 完成后增量接入：
 > 11. 以 `apps/console` 为模板新增 `apps/admin`（独立入口/构建产物/域名），复用 `packages/*`（ui/brand/theme/i18n/sdk），不复制白标与设计系统。
 > 12. admin 鉴权切到**跨租户 superadmin 角色**（不绑 org），路由守卫与 console 区分。
 > 13. admin 首屏对接 `control-plane`：租户目录 / 注册审批 / 开通状态 / 配额 / 生命周期（先 mock，后接真实 API）。
