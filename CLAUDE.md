@@ -62,3 +62,19 @@
 平台**唯一前端仓**（其余 submodule 均为无界面后端服务）：使用平面控制台 + 数据大屏 + 可视化编排画布（`apps/console`）+ 管理平面运营控制台（`apps/admin`）。
 
 技术栈**已定稿**（详见 `docs/00-前端初始化-spec.md`）：React 19 + TS(strict) + Vite SPA · **pnpm monorepo 双 app** · Ant Design v6 + ProComponents · AntV(X6/G6/G2/S2) · react-i18next · TanStack Query + Zustand · Keycloak OIDC · Storybook + Playwright(基于 Storybook) + Vitest。当前处脚手架阶段。
+
+## 🔗 契约（Contracts）—— 跨子系统集成
+
+本仓经**契约**消费后端能力（`packages/sdk` 即由主仓契约生成）。契约的**单一事实源在主仓** `HashMatrixData/hashmatrix` 的 `contracts/`：
+- 索引（机器可读）`contracts/registry.yaml` · 规范 `contracts/CONVENTIONS.md` · 设计 `docs/architecture/06-契约治理.md`
+- 在线：https://github.com/HashMatrixData/hashmatrix/tree/main/contracts
+
+**铁律**：先改契约、再改实现；加法兼容默认放行，破坏性走 MAJOR + 弃用期双跑 + 通知消费方；消费方一律 tolerant reader。
+
+**本仓契约**：
+- producer：暂无
+- consumer：`icd/governance-metadata`（资产门户取数）；后端各服务 REST **OpenAPI** 契约（`contracts/openapi/*`，用于生成 `packages/sdk`，待落地）
+
+**如何查阅（随时拉最新，勿存本地副本）**：
+- 在 superproject（`hashmatrix/services/webui`）下：直接读 `../../contracts/`。
+- 独立 clone：WebFetch `https://raw.githubusercontent.com/HashMatrixData/hashmatrix/main/contracts/registry.yaml`（公开仓免鉴权）→ 按 registry 取对应契约；或 `gh api repos/HashMatrixData/hashmatrix/contents/contracts/<path> -H "Accept: application/vnd.github.raw"`。
