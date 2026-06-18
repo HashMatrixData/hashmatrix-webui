@@ -11,18 +11,26 @@
   },
   "packageManager": "pnpm@11.7.0",
   "scripts": {
-    "dev": "pnpm --filter @hashmatrix/app dev",
-    "build": "pnpm --filter @hashmatrix/app build",
-    "preview": "pnpm --filter @hashmatrix/app preview",
-    "lint": "pnpm --filter @hashmatrix/app lint",
-    "typecheck": "pnpm --filter @hashmatrix/app typecheck",
-    "test": "pnpm --filter @hashmatrix/app test",
-    "storybook": "pnpm --filter @hashmatrix/app storybook",
-    "build-storybook": "pnpm --filter @hashmatrix/app build-storybook",
-    "test-storybook": "pnpm --filter @hashmatrix/app test-storybook",
-    "format": "prettier --write \"packages/**/*.{ts,tsx,css,json,md}\""
+    "dev": "pnpm --filter @hashmatrix/console dev",
+    "build": "pnpm --filter @hashmatrix/console build",
+    "preview": "pnpm --filter @hashmatrix/console preview",
+    "lint": "eslint .",
+    "typecheck": "pnpm --filter @hashmatrix/console typecheck",
+    "test": "pnpm --filter @hashmatrix/console test",
+    "storybook": "pnpm --filter @hashmatrix/console storybook",
+    "build-storybook": "pnpm --filter @hashmatrix/console build-storybook",
+    "test-storybook": "pnpm --filter @hashmatrix/console test-storybook",
+    "format": "prettier --write \"{apps,packages}/**/*.{ts,tsx,css,json,md}\""
   },
   "devDependencies": {
-    "prettier": "^3.4.2"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.5.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.3",
+    "eslint-plugin-storybook": "^10.4.6",
+    "globals": "^17.6.0",
+    "prettier": "^3.4.2",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.61.1"
   }
 }

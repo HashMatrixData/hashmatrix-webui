@@ -1,0 +1,15 @@
+{
+  "name": "@hashmatrix/brand",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "白标引擎：单一品牌配置源 → 四路分发（AntD token / CSS Vars / i18n 品牌串 / 资源槽位）。两 app 共享。",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "i18next": "^26.3.1",
+    "zustand": "^5.0.14"
+  }
+}

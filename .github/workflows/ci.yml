@@ -42,7 +42,7 @@ jobs:
         run: pnpm build-storybook
 
       - name: Install Playwright browser
-        run: pnpm --filter @hashmatrix/app exec playwright install --with-deps chromium
+        run: pnpm --filter @hashmatrix/console exec playwright install --with-deps chromium
 
       - name: E2E (Playwright on Storybook)
-        run: pnpm --filter @hashmatrix/app test-storybook:ci
+        run: pnpm --filter @hashmatrix/console test-storybook:ci
