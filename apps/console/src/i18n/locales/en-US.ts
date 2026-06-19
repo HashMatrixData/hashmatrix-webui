@@ -57,6 +57,9 @@ const consoleEnUS: ConsoleResources = {
   placeholder: {
     comingSoon: 'Under construction — stay tuned',
   },
+  tenant: {
+    label: 'Tenant',
+  },
   overview: {
     intro: 'Overview of tenant data assets and runtime status (demo data).',
     kpiDatasets: 'Datasets',

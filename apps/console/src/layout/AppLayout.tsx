@@ -9,6 +9,7 @@ import { useThemeStore } from '@hashmatrix/theme';
 import { useSession, usePermission, isOidcEnabled } from '@hashmatrix/sdk';
 import { LanguageSwitch, ThemeSwitch, BrandSwitch, RoleSwitcher } from '@hashmatrix/ui';
 import { NAV_ITEMS, type NavItem } from '@/routes/navConfig';
+import { TenantSwitcher } from './TenantSwitcher';
 
 /**
  * 应用外壳：ProLayout 导航 + 品牌位 + 头部操作区（语言/明暗/换肤/角色）+ 用户菜单。
@@ -53,6 +54,7 @@ export function AppLayout() {
       menuItemRender={(item, dom) => <Link to={item.path ?? '/'}>{dom}</Link>}
       actionsRender={() => [
         <Space key="actions" size="middle" wrap>
+          <TenantSwitcher />
           <LanguageSwitch />
           <ThemeSwitch />
           <BrandSwitch />

@@ -56,6 +56,9 @@ const consoleZhCN = {
   placeholder: {
     comingSoon: '功能建设中，敬请期待',
   },
+  tenant: {
+    label: '租户',
+  },
   overview: {
     intro: '租户数据资产与运行态总览（演示数据）。',
     kpiDatasets: '数据集',
