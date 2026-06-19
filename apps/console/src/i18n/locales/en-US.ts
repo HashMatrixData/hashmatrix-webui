@@ -57,6 +57,41 @@ const consoleEnUS: ConsoleResources = {
   placeholder: {
     comingSoon: 'Under construction — stay tuned',
   },
+  overview: {
+    intro: 'Overview of tenant data assets and runtime status (demo data).',
+    kpiDatasets: 'Datasets',
+    kpiJobs: 'Scheduled Jobs',
+    kpiQuality: 'Quality Pass Rate',
+    kpiPrivacy: 'Privacy Tasks',
+    trendTitle: 'Data Volume Trend (Last 7 Days)',
+  },
+  catalog: {
+    intro:
+      'Tenant-wide data asset map: search, layers, owners and quality scores (server-side pagination · demo data).',
+    tableCardTitle: 'Data Asset Catalog',
+  },
+  quality: {
+    intro: 'Data quality dashboard: rule execution results and quality dimensions (demo data).',
+    kpiRules: 'Quality Rules',
+    kpiPassRate: 'Overall Pass Rate',
+    kpiAnomalies: 'Anomalies',
+    kpiCoverage: 'Asset Coverage',
+    rulesCardTitle: 'Quality Rule Execution',
+    colName: 'Rule',
+    colDataset: 'Target Table',
+    colDimension: 'Dimension',
+    colStatus: 'Status',
+    colPassRate: 'Pass Rate',
+    colLastRun: 'Last Run',
+    statusPass: 'Pass',
+    statusWarn: 'Warn',
+    statusFail: 'Fail',
+    dimCompleteness: 'Completeness',
+    dimAccuracy: 'Accuracy',
+    dimConsistency: 'Consistency',
+    dimTimeliness: 'Timeliness',
+    dimUniqueness: 'Uniqueness',
+  },
   demo: {
     title: 'Three-Switch Demo',
     subtitle: 'Language / Dark / Skin in real time',
@@ -92,6 +127,30 @@ const consoleEnUS: ConsoleResources = {
   orchestration: {
     statusFixed: 'Status colors are fixed:',
     selectedNote: 'The selected task border follows the brand accent.',
+  },
+  // —— WP3 data-production-chain pages (#11: integration / architecture / development) ——
+  integration: {
+    intro: 'Integration tasks overview (batch / realtime; demo data is masked).',
+    colName: 'Task',
+    colMode: 'Sync Mode',
+    colSource: 'Source',
+    colTarget: 'Target',
+    colStatus: 'Status',
+    colLastRun: 'Last Run',
+    modeBatch: 'Batch',
+    modeRealtime: 'Realtime',
+    statusSuccess: 'Success',
+    statusRunning: 'Running',
+    statusFailed: 'Failed',
+  },
+  architecture: {
+    intro:
+      'Warehouse-layered lineage (G6): the focused node border uses the brand accent; structural colors are fixed. Drag / zoom the canvas.',
+  },
+  development: {
+    intro: 'Data-development job orchestration (X6 DAG).',
+    statusLegend:
+      'Status colors are fixed (success / running / failed); the selected task border follows the brand accent.',
   },
   dashboard: {
     datasets: 'Datasets',
