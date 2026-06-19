@@ -16,7 +16,8 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(async () => {
-      await expect(await canvas.findByText('tenant-soylent')).toBeInTheDocument();
+      // 断言显示名（唯一）——待审租户 tenant-soylent 的 tenantId 与 orgAlias 同值，会命中多列。
+      await expect(await canvas.findByText('Soylent Demo')).toBeInTheDocument();
     });
   },
 };

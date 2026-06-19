@@ -16,7 +16,8 @@ export const Default: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(async () => {
-      await expect(await canvas.findByText('tenant-acme')).toBeInTheDocument();
+      // 断言显示名（唯一）——租户 ID 在 M1 与 orgAlias 同值，断言 tenantId 会命中多列。
+      await expect(await canvas.findByText('Acme Demo')).toBeInTheDocument();
     });
     // 每行三类生命周期操作（启用/停用/注销），按钮可达即满足运营入口。
     // 注：AntD 对「两个汉字」按钮会自动插入空格（启用 → “启 用”），故按名匹配需忽略空白。

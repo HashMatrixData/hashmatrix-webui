@@ -1,75 +1,44 @@
-import { ModalForm, ProFormDigit } from '@ant-design/pro-components';
-import { App, Button, Card, Progress, Table, type TableColumnsType } from 'antd';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Card, Table, Typography, type TableColumnsType } from 'antd';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { listQuotas, updateQuota } from '@/api/controlPlane';
-import type { Quota, QuotaDimension } from '@/api/types';
+import { listTenants } from '@/api/controlPlane';
+import type { Tenant } from '@/api/types';
 
-function usageCell(d: QuotaDimension) {
-  return <Progress percent={Math.round((d.used / d.limit) * 100)} size="small" format={() => `${d.used}/${d.limit}`} />;
-}
-
-/** 配额查看与调整（control-plane mock）。 */
+/**
+ * 配额查看（control-plane mock）。
+ * 契约 v1.2.0 / B：M1 **仅展示配额限额**——`usage`（用量条）与 `GET /quota`、配额写入端点均未落地，
+ * 故无用量进度条、无在线调整入口；配额额度（QuotaSpec）取自租户目录条目 `Tenant.quota`。
+ */
 export function QuotasPage() {
   const { t } = useTranslation();
-  const { message } = App.useApp();
-  const qc = useQueryClient();
-  const { data = [], isLoading } = useQuery({ queryKey: ['quotas'], queryFn: listQuotas });
-
-  const save = useMutation({
-    mutationFn: (v: { row: Quota; limits: Record<'cpu' | 'mem' | 'storage' | 'users', number> }) =>
-      updateQuota(v.row.tenantId, {
-        cpu: { used: v.row.cpu.used, limit: v.limits.cpu },
-        mem: { used: v.row.mem.used, limit: v.limits.mem },
-        storage: { used: v.row.storage.used, limit: v.limits.storage },
-        users: { used: v.row.users.used, limit: v.limits.users },
-      }),
-    onSuccess: (q) => {
-      void qc.invalidateQueries({ queryKey: ['quotas'] });
-      message.success(t('quota.saveOk', { name: q.tenantName }));
-    },
+  const { data, isLoading } = useQuery({
+    queryKey: ['tenants', 'quotas'],
+    queryFn: () => listTenants({ pageSize: 200 }),
   });
+  // 仅展示已分配配额且未注销的租户。
+  const rows = (data?.items ?? []).filter((tn) => tn.quota && tn.status !== 'deleted');
+  const num = (v?: number) => (typeof v === 'number' ? String(v) : t('tenant.none'));
 
-  const columns: TableColumnsType<Quota> = [
-    { title: t('quota.colTenant'), dataIndex: 'tenantName' },
-    { title: t('quota.cpu'), dataIndex: 'cpu', width: 200, render: (d: QuotaDimension) => usageCell(d) },
-    { title: t('quota.mem'), dataIndex: 'mem', width: 200, render: (d: QuotaDimension) => usageCell(d) },
-    { title: t('quota.storage'), dataIndex: 'storage', width: 200, render: (d: QuotaDimension) => usageCell(d) },
-    { title: t('quota.users'), dataIndex: 'users', width: 200, render: (d: QuotaDimension) => usageCell(d) },
-    {
-      title: '',
-      width: 120,
-      render: (_, row) => (
-        <ModalForm
-          title={t('quota.adjustTitle', { name: row.tenantName })}
-          trigger={<Button size="small">{t('quota.adjust')}</Button>}
-          width={360}
-          initialValues={{ cpu: row.cpu.limit, mem: row.mem.limit, storage: row.storage.limit, users: row.users.limit }}
-          onFinish={async (values) => {
-            await save.mutateAsync({
-              row,
-              limits: {
-                cpu: Number(values.cpu),
-                mem: Number(values.mem),
-                storage: Number(values.storage),
-                users: Number(values.users),
-              },
-            });
-            return true;
-          }}
-        >
-          <ProFormDigit name="cpu" label={`${t('quota.cpu')} · ${t('quota.limit')}`} min={1} />
-          <ProFormDigit name="mem" label={`${t('quota.mem')} · ${t('quota.limit')}`} min={1} />
-          <ProFormDigit name="storage" label={`${t('quota.storage')} · ${t('quota.limit')}`} min={1} />
-          <ProFormDigit name="users" label={`${t('quota.users')} · ${t('quota.limit')}`} min={1} />
-        </ModalForm>
-      ),
-    },
+  const columns: TableColumnsType<Tenant> = [
+    { title: t('quota.colTenant'), dataIndex: 'tenantId', width: 180 },
+    { title: t('quota.maxUsers'), width: 140, render: (_, row) => num(row.quota?.maxUsers) },
+    { title: t('quota.maxStorage'), width: 160, render: (_, row) => num(row.quota?.maxStorageGi) },
+    { title: t('quota.maxJobs'), width: 150, render: (_, row) => num(row.quota?.maxConcurrentJobs) },
+    { title: t('quota.cpu'), width: 120, render: (_, row) => num(row.quota?.compute?.cpuCores) },
+    { title: t('quota.mem'), width: 130, render: (_, row) => num(row.quota?.compute?.memoryGi) },
   ];
 
   return (
     <Card title={t('quota.title')}>
-      <Table<Quota> rowKey="tenantId" loading={isLoading} columns={columns} dataSource={data} pagination={false} />
+      <Typography.Paragraph type="secondary">{t('quota.intro')}</Typography.Paragraph>
+      <Table<Tenant>
+        rowKey="tenantId"
+        loading={isLoading}
+        columns={columns}
+        dataSource={rows}
+        pagination={false}
+        locale={{ emptyText: t('quota.empty') }}
+      />
     </Card>
   );
 }

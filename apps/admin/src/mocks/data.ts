@@ -1,30 +1,136 @@
-import type { Tenant, Registration, ProvisionJob, Quota } from '@/api/types';
+import type { ProvisioningStatus, Tenant } from '@/api/types';
 
-/** control-plane mock 数据（脱敏：通用 tenant-* 占位，无任何真实甲方信息）。确定性、可断言。 */
+/**
+ * control-plane mock 数据（脱敏：通用 tenant-* / org-* / example.com 占位，无任何真实甲方信息）。
+ * 确定性、可断言。形态对齐契约 v1.2.0：嵌套 organization / dataPlane / quota，6 态状态机。
+ * 覆盖全部状态以便各页客户端过滤（registered/approving 待审、provisioning 开通、deleted 可见历史）。
+ */
+
+const quota = (
+  maxUsers: number,
+  maxStorageGi: number,
+  maxConcurrentJobs: number,
+  cpuCores: number,
+  memoryGi: number,
+): Tenant['quota'] => ({ maxUsers, maxStorageGi, maxConcurrentJobs, compute: { cpuCores, memoryGi } });
+
+const refs = (alias: string): Pick<Tenant, 'organization' | 'dataPlane'> => ({
+  organization: { orgId: `00000000-0000-4000-8000-${alias.replace(/[^0-9a-f]/g, '').padStart(12, '0').slice(-12)}`, orgAlias: alias },
+  dataPlane: {
+    namespace: alias,
+    dbSchema: alias.replace(/-/g, '_'),
+    dorisCatalog: alias.replace(/-/g, '_'),
+    helmRelease: alias,
+  },
+});
 
 export const TENANTS: Tenant[] = [
-  { id: 't_001', name: 'tenant-acme', org: 'org-acme', plan: 'enterprise', status: 'active', createdAt: '2025-11-02' },
-  { id: 't_002', name: 'tenant-demo', org: 'org-demo', plan: 'standard', status: 'active', createdAt: '2025-12-15' },
-  { id: 't_003', name: 'tenant-globex', org: 'org-globex', plan: 'standard', status: 'suspended', createdAt: '2026-01-08' },
-  { id: 't_004', name: 'tenant-initech', org: 'org-initech', plan: 'free', status: 'active', createdAt: '2026-02-20' },
-  { id: 't_005', name: 'tenant-umbrella', org: 'org-umbrella', plan: 'enterprise', status: 'deactivated', createdAt: '2026-03-11' },
+  {
+    tenantId: 'tenant-acme',
+    displayName: 'Acme Demo',
+    status: 'active',
+    ...refs('tenant-acme'),
+    quota: quota(1000, 4096, 20, 64, 256),
+    statusReason: '开通完成',
+    createdAt: '2025-11-02T08:00:00Z',
+    updatedAt: '2025-11-02T08:05:00Z',
+  },
+  {
+    tenantId: 'tenant-demo',
+    displayName: 'Demo Tenant',
+    status: 'active',
+    ...refs('tenant-demo'),
+    quota: quota(200, 1024, 10, 16, 64),
+    createdAt: '2025-12-15T03:20:00Z',
+  },
+  {
+    tenantId: 'tenant-globex',
+    displayName: 'Globex Demo',
+    status: 'suspended',
+    ...refs('tenant-globex'),
+    quota: quota(200, 1024, 10, 16, 64),
+    statusReason: '欠费暂停（演示）',
+    createdAt: '2026-01-08T11:00:00Z',
+  },
+  {
+    tenantId: 'tenant-initech',
+    displayName: 'Initech Demo',
+    status: 'active',
+    ...refs('tenant-initech'),
+    quota: quota(50, 256, 4, 4, 16),
+    createdAt: '2026-02-20T09:30:00Z',
+  },
+  {
+    // 待审：自助注册落为一条 status=registered 的 Tenant（无独立 registrations 资源）。
+    tenantId: 'tenant-soylent',
+    displayName: 'Soylent Demo',
+    status: 'registered',
+    organization: { orgAlias: 'tenant-soylent' },
+    quota: quota(100, 512, 8, 8, 32),
+    createdAt: '2026-06-01T06:00:00Z',
+  },
+  {
+    tenantId: 'tenant-hooli',
+    displayName: 'Hooli Demo',
+    status: 'approving',
+    organization: { orgAlias: 'tenant-hooli' },
+    quota: quota(500, 2048, 16, 32, 128),
+    createdAt: '2026-06-03T07:15:00Z',
+  },
+  {
+    // 开通中：phase in_progress（见 PROVISIONING）。
+    tenantId: 'tenant-stark',
+    displayName: 'Stark Demo',
+    status: 'provisioning',
+    ...refs('tenant-stark'),
+    quota: quota(500, 2048, 16, 32, 128),
+    createdAt: '2026-06-10T02:00:00Z',
+  },
+  {
+    // 开通失败：停在 provisioning（phase failed），可重试。
+    tenantId: 'tenant-vehement',
+    displayName: 'Vehement Demo',
+    status: 'provisioning',
+    organization: { orgAlias: 'tenant-vehement' },
+    quota: quota(50, 256, 4, 4, 16),
+    statusReason: 'helm release 应用失败（演示）',
+    createdAt: '2026-06-12T05:40:00Z',
+  },
+  {
+    // 已驳回/已注销：软删除，行保留 + statusReason 留痕，仍在目录列出（C）。
+    tenantId: 'tenant-umbrella',
+    displayName: 'Umbrella Demo',
+    status: 'deleted',
+    organization: { orgAlias: 'tenant-umbrella' },
+    statusReason: '驳回：演示资料不完整',
+    createdAt: '2026-03-11T10:00:00Z',
+    updatedAt: '2026-03-12T10:00:00Z',
+  },
 ];
 
-export const REGISTRATIONS: Registration[] = [
-  { id: 'r_101', tenantName: 'tenant-soylent', org: 'org-soylent', requestedPlan: 'standard', requestedAt: '2026-06-01', status: 'pending' },
-  { id: 'r_102', tenantName: 'tenant-hooli', org: 'org-hooli', requestedPlan: 'enterprise', requestedAt: '2026-06-03', status: 'pending' },
-  { id: 'r_103', tenantName: 'tenant-piedpiper', org: 'org-piedpiper', requestedPlan: 'free', requestedAt: '2026-05-28', status: 'approved' },
-];
-
-export const PROVISION_JOBS: ProvisionJob[] = [
-  { tenantId: 't_006', tenantName: 'tenant-soylent', step: 'schema 初始化', progress: 60, status: 'running' },
-  { tenantId: 't_007', tenantName: 'tenant-hooli', step: 'namespace 创建', progress: 30, status: 'running' },
-  { tenantId: 't_009', tenantName: 'tenant-stark', step: '完成', progress: 100, status: 'succeeded' },
-  { tenantId: 't_008', tenantName: 'tenant-vehement', step: 'Keycloak org 绑定', progress: 45, status: 'failed' },
-];
-
-export const QUOTAS: Quota[] = [
-  { tenantId: 't_001', tenantName: 'tenant-acme', cpu: { used: 28, limit: 64 }, mem: { used: 96, limit: 256 }, storage: { used: 1200, limit: 4096 }, users: { used: 420, limit: 1000 } },
-  { tenantId: 't_002', tenantName: 'tenant-demo', cpu: { used: 6, limit: 16 }, mem: { used: 18, limit: 64 }, storage: { used: 220, limit: 1024 }, users: { used: 48, limit: 200 } },
-  { tenantId: 't_004', tenantName: 'tenant-initech', cpu: { used: 2, limit: 4 }, mem: { used: 5, limit: 16 }, storage: { used: 60, limit: 256 }, users: { used: 9, limit: 50 } },
-];
+/** 单租户开通状态（仅 provisioning 态租户有意义）。keyed by tenantId。 */
+export const PROVISIONING: Record<string, ProvisioningStatus> = {
+  'tenant-stark': {
+    tenantId: 'tenant-stark',
+    phase: 'in_progress',
+    startedAt: '2026-06-10T02:01:00Z',
+    steps: [
+      { target: 'keycloak', status: 'succeeded', message: 'organization created', updatedAt: '2026-06-10T02:02:00Z' },
+      { target: 'helm', status: 'in_progress', message: 'applying per-tenant release', updatedAt: '2026-06-10T02:03:00Z' },
+      { target: 'datastore', status: 'pending' },
+      { target: 'secrets', status: 'pending' },
+    ],
+  },
+  'tenant-vehement': {
+    tenantId: 'tenant-vehement',
+    phase: 'failed',
+    startedAt: '2026-06-12T05:41:00Z',
+    finishedAt: '2026-06-12T05:44:00Z',
+    steps: [
+      { target: 'keycloak', status: 'succeeded', message: 'organization created', updatedAt: '2026-06-12T05:42:00Z' },
+      { target: 'helm', status: 'failed', message: 'release apply timeout', updatedAt: '2026-06-12T05:44:00Z' },
+      { target: 'datastore', status: 'skipped' },
+      { target: 'secrets', status: 'skipped' },
+    ],
+  },
+};
