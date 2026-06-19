@@ -6,10 +6,14 @@ interface KeycloakAccessClaims {
   name?: string;
   preferred_username?: string;
   email?: string;
+  /** 租户声明（Keycloak Organizations，org=租户；见 extractTenant）。claim 名待 IdP mapper 契约最终确认。 */
+  tenant?: string;
+  /** 多 org membership（D1）；通常缺省或单元素。 */
+  tenants?: string[];
 }
 
-/** Base64URL JWT payload 解码（仅读 claims，不做签名校验——校验在网关/IdP 侧）。 */
-function decodeJwtPayload(token: string): KeycloakAccessClaims | null {
+/** Base64URL JWT payload 解码（仅读 claims，不做签名校验——校验在网关/IdP 侧）。角色与租户提取共用。 */
+export function decodeJwtPayload(token: string): KeycloakAccessClaims | null {
   const parts = token.split('.');
   if (parts.length < 2) return null;
   try {

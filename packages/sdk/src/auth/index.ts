@@ -1,5 +1,6 @@
 export { ROLES, hasAnyRole, type Role } from './roles';
 export { SessionContext, type Session, type SessionUser } from './session';
+export { extractTenant, type TenantContext } from './extractTenant';
 export { useSession } from './useSession';
 export { usePermission } from './usePermission';
 export { PermissionGuard } from './PermissionGuard';
