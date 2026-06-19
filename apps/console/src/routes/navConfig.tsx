@@ -1,35 +1,192 @@
 import type { ReactNode } from 'react';
 import type { ParseKeys } from 'i18next';
 import {
-  ExperimentOutlined,
-  DeploymentUnitOutlined,
-  PartitionOutlined,
-  FundOutlined,
+  HomeOutlined,
+  ControlOutlined,
+  SwapOutlined,
+  BuildOutlined,
+  CodeOutlined,
+  CheckCircleOutlined,
+  FolderOpenOutlined,
   SafetyOutlined,
+  ApiOutlined,
+  LockOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
-import { ROLES } from '@hashmatrix/sdk';
 
-/** 导航/路由单一来源：被 ProLayout 菜单与 React Router 路由共同消费。 */
+/**
+ * 导航/路由单一来源：被 ProLayout 菜单（{@link NAV_ITEMS}）与 React Router 路由
+ * （{@link NAV_LEAVES}）共同消费——菜单与路由由同一棵树派生，结构上保证「零断链」。
+ *
+ * 本树为 WP2「使能刀」铺设的 canonical 一级模块（L1）骨架：
+ * - taxonomy 是跨仓共享物（prototype + console + PRD）= 契约级、主仓 owns，子仓不自创。
+ *   canonical 源 = 主仓 prototype submodule `prototype/components/sidebar.tsx`（已逐项核对）。
+ * - **L1 共 11**（含独立的「组织管理」，非折叠进管理中心）；M1 仅落 **L1/L2**，
+ *   canonical 更深的 L3/L4 显式后置（由各页面刀 #11/#12/#13 增量接入）。
+ * - 每个 L2 在 M1 即为可达叶子，渲染共享 `<ModulePlaceholder>` 标题占位页。
+ *   路径取舍：canonical 已给 href 的叶子按原样使用；canonical 下挂 L3 的分组节点
+ *   （M1 暂作叶子）使用「模块前缀 + 节点 slug」的**占位路径**，待其 L3 落地时该节点
+ *   转为父级、占位路径自然退役（不影响骨架，故不构成返工）。
+ */
 export interface NavItem {
   path: string;
   /** i18n key（受静态校验）。 */
   labelKey: ParseKeys;
-  icon: ReactNode;
-  /** 路由级/菜单级所需角色（OR）。缺省 → 任何登录用户。 */
+  /** L1 模块携带图标；L2 叶子省略。 */
+  icon?: ReactNode;
+  /** 路由级/菜单级所需角色（OR）。缺省 → 任何登录用户。M1 不做门控（见 #14）。 */
   roles?: readonly string[];
+  /** L2 子项（M1 菜单深度 ≤ 2）。 */
+  children?: NavItem[];
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { path: '/playground', labelKey: 'menu.playground', icon: <ExperimentOutlined /> },
-  { path: '/lineage', labelKey: 'menu.lineage', icon: <DeploymentUnitOutlined /> },
-  { path: '/orchestration', labelKey: 'menu.orchestration', icon: <PartitionOutlined /> },
-  { path: '/dashboard', labelKey: 'menu.dashboard', icon: <FundOutlined /> },
+  // 1. 概览（L1 叶子 → 落地首页）
+  { path: '/', labelKey: 'menu.overview', icon: <HomeOutlined /> },
+
+  // 2. 管理中心（基础配置的标签/逻辑类型映射/告警 = L3 后置）
   {
-    path: '/governance',
-    labelKey: 'menu.governance',
+    path: '/management-center',
+    labelKey: 'menu.managementCenter',
+    icon: <ControlOutlined />,
+    children: [
+      { path: '/datasource', labelKey: 'menu.datasource' },
+      { path: '/settings/basic-config', labelKey: 'menu.basicConfig' },
+    ],
+  },
+
+  // 3. 数据集成（离线/实时各自的 L3 子项后置）
+  {
+    path: '/data-integration',
+    labelKey: 'menu.dataIntegration',
+    icon: <SwapOutlined />,
+    children: [
+      { path: '/integration/batch', labelKey: 'menu.batchIntegration' },
+      { path: '/integration/realtime', labelKey: 'menu.realtimeIntegration' },
+    ],
+  },
+
+  // 4. 数据架构（模型设计>维度建模>… 等 L3/L4 后置）
+  {
+    path: '/data-architecture',
+    labelKey: 'menu.dataArchitecture',
+    icon: <BuildOutlined />,
+    children: [
+      { path: '/standard/warehouse-design', labelKey: 'menu.warehouseDesign' },
+      { path: '/standard/data-standard', labelKey: 'menu.dataStandard' },
+      { path: '/standard/model-design', labelKey: 'menu.modelDesign' },
+      { path: '/standard/model-design/dws-designer', labelKey: 'menu.dwsDesigner' },
+      { path: '/standard/model-design/ads-designer', labelKey: 'menu.adsDesigner' },
+      { path: '/standard/indicators', labelKey: 'menu.dataIndicator' },
+    ],
+  },
+
+  // 5. 数据开发
+  {
+    path: '/data-development',
+    labelKey: 'menu.dataDevelopment',
+    icon: <CodeOutlined />,
+    children: [
+      { path: '/development/data-dev', labelKey: 'menu.devWorkbench' },
+      { path: '/development/periodic-schedule', labelKey: 'menu.periodicTask' },
+      { path: '/development/query', labelKey: 'menu.tempQuery' },
+      { path: '/development/ops/overview', labelKey: 'menu.opsMonitor' },
+    ],
+  },
+
+  // 6. 数据质量
+  {
+    path: '/data-quality',
+    labelKey: 'menu.dataQuality',
+    icon: <CheckCircleOutlined />,
+    children: [
+      { path: '/asset/quality/monitor-dashboard', labelKey: 'menu.qualityDashboard' },
+      { path: '/asset/quality/rule-manager', labelKey: 'menu.qualityRules' },
+    ],
+  },
+
+  // 7. 数据目录
+  {
+    path: '/data-catalog',
+    labelKey: 'menu.dataCatalog',
+    icon: <FolderOpenOutlined />,
+    children: [
+      { path: '/catalog/map', labelKey: 'menu.catalogMap' },
+      { path: '/catalog/analysis', labelKey: 'menu.catalogLineage' },
+      { path: '/asset/metadata/meta-model', labelKey: 'menu.metaModel' },
+      { path: '/asset/metadata/crawler', labelKey: 'menu.metadataCrawler' },
+    ],
+  },
+
+  // 8. 数据安全（分类分级/脱敏/水印/统一权限各自的 L3 后置）
+  {
+    path: '/data-security',
+    labelKey: 'menu.dataSecurity',
     icon: <SafetyOutlined />,
-    roles: [ROLES.GOVERNANCE_EDITOR, ROLES.ADMIN],
+    children: [
+      { path: '/asset/security/classification', labelKey: 'menu.classification' },
+      { path: '/asset/security/masking', labelKey: 'menu.dataMasking' },
+      { path: '/asset/security/watermark', labelKey: 'menu.dataWatermark' },
+      // 注：此占位路径恰等于 canonical 该节点首个 L3「数据权限/overview」的 href——
+      // L3 落地时应把本 path 升级为该 overview 子路由（而非新建平行路径），实现无缝退役。
+      { path: '/asset/security/permission', labelKey: 'menu.dataPermission' },
+      { path: '/asset/security/policy-manager', labelKey: 'menu.securityPolicy' },
+    ],
+  },
+
+  // 9. 数据服务
+  {
+    path: '/data-service',
+    labelKey: 'menu.dataService',
+    icon: <ApiOutlined />,
+    children: [{ path: '/api-service/developer', labelKey: 'menu.apiDeveloper' }],
+  },
+
+  // 10. 隐私计算（我方特色）
+  {
+    path: '/privacy-computing',
+    labelKey: 'menu.privacyComputing',
+    icon: <LockOutlined />,
+    children: [
+      { path: '/privacy/overview', labelKey: 'menu.privacyOverview' },
+      { path: '/privacy/psi', labelKey: 'menu.privacyPsi' },
+      { path: '/privacy/anonymous-query', labelKey: 'menu.privacyAnonymous' },
+      { path: '/privacy/nodes', labelKey: 'menu.privacyNodes' },
+    ],
+  },
+
+  // 11. 组织管理（独立 L1 · 租户自治；角色门控见 #14）
+  {
+    path: '/org-admin',
+    labelKey: 'menu.orgAdmin',
+    icon: <TeamOutlined />,
+    children: [
+      { path: '/settings/users', labelKey: 'menu.orgMembers' },
+      { path: '/settings/roles', labelKey: 'menu.orgRoles' },
+      { path: '/settings/user-groups', labelKey: 'menu.orgGroups' },
+    ],
   },
 ];
 
-export const DEFAULT_ROUTE = '/playground';
+/** 路由消费的扁平叶子描述（由 {@link NAV_ITEMS} 派生，保证菜单↔路由一一对应）。 */
+export interface NavLeaf {
+  path: string;
+  labelKey: ParseKeys;
+  roles?: readonly string[];
+}
+
+function collectLeaves(items: NavItem[], acc: NavLeaf[] = []): NavLeaf[] {
+  for (const item of items) {
+    if (item.children && item.children.length > 0) {
+      collectLeaves(item.children, acc);
+    } else {
+      acc.push({ path: item.path, labelKey: item.labelKey, roles: item.roles });
+    }
+  }
+  return acc;
+}
+
+export const NAV_LEAVES: NavLeaf[] = collectLeaves(NAV_ITEMS);
+
+/** 落地/兜底路由：概览。 */
+export const DEFAULT_ROUTE = '/';
