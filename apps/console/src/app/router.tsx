@@ -48,7 +48,19 @@ const QualityPage = lazy(() =>
   import('@/modules/quality/QualityPage').then((m) => ({ default: m.QualityPage })),
 );
 
-/** canonical 叶子路径 → 真页（覆盖默认 ModulePlaceholder）。后续页面刀（#13…）按此 map 增量接入。 */
+// #13 WP3 · 治理与服务：数据安全（原生自研）/ 数据服务（原生自研）/ 隐私计算（品牌化外框占位）。
+// 各挂在所属 L1 模块首叶；同模块其余叶子仍渲染 <ModulePlaceholder>，菜单零断链。
+const SecurityPage = lazy(() =>
+  import('@/modules/security/SecurityPage').then((m) => ({ default: m.SecurityPage })),
+);
+const ServicePage = lazy(() =>
+  import('@/modules/service/ServicePage').then((m) => ({ default: m.ServicePage })),
+);
+const PrivacyPage = lazy(() =>
+  import('@/modules/privacy/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
+);
+
+/** canonical 叶子路径 → 真页（覆盖默认 ModulePlaceholder）。后续页面刀按此 map 增量接入。 */
 const REAL_PAGE_BY_PATH: Record<string, ReactNode> = {
   // #11 数据生产链
   '/integration/batch': <IntegrationPage />,
@@ -57,6 +69,10 @@ const REAL_PAGE_BY_PATH: Record<string, ReactNode> = {
   // #12 资产与质量（概览见下方 index 路由）
   '/catalog/map': <CatalogPage />,
   '/asset/quality/monitor-dashboard': <QualityPage />,
+  // #13 治理与服务
+  '/asset/security/classification': <SecurityPage />,
+  '/api-service/developer': <ServicePage />,
+  '/privacy/overview': <PrivacyPage />,
 };
 
 const demoRoutes: RouteObject[] = [
