@@ -15,7 +15,7 @@ export interface BrandPreset {
 }
 
 export const BRAND_PRESETS: BrandPreset[] = [
-  { key: 'default', labelKey: 'brand.preset.default', colorPrimary: '#1668dc', colorSecondary: '#13c2c2' },
+  { key: 'default', labelKey: 'brand.preset.default', colorPrimary: '#059669', colorSecondary: '#10b981' },
   { key: 'violet', labelKey: 'brand.preset.violet', colorPrimary: '#722ed1', colorSecondary: '#eb2f96' },
   { key: 'forest', labelKey: 'brand.preset.forest', colorPrimary: '#389e0d', colorSecondary: '#d48806' },
   { key: 'sunset', labelKey: 'brand.preset.sunset', colorPrimary: '#d4380d', colorSecondary: '#fa8c16' },

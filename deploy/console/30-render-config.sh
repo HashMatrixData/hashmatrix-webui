@@ -5,8 +5,8 @@ set -eu
 
 : "${BRAND_APP_NAME:=HashMatrix}"
 : "${BRAND_COMPANY_NAME:=Acme Demo Tech}"
-: "${BRAND_COLOR_PRIMARY:=#1668dc}"
-: "${BRAND_COLOR_SECONDARY:=#13c2c2}"
+: "${BRAND_COLOR_PRIMARY:=#059669}"
+: "${BRAND_COLOR_SECONDARY:=#10b981}"
 : "${API_BASE_URL:=/api}"
 : "${OIDC_AUTHORITY:=}"
 : "${OIDC_CLIENT_ID:=hashmatrix-webui}"

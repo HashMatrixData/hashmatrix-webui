@@ -1,7 +1,7 @@
 :root {
-  /* 白标 CSS Vars 默认值（运行期由白标引擎覆盖到 :root）。与 console 同一套引擎。 */
-  --brand-primary: #1668dc;
-  --brand-secondary: #13c2c2;
+  /* 白标 CSS Vars 默认值（运行期由白标引擎覆盖到 :root）。与 console 同一套引擎，须与 brand.default.json 同源（D4 emerald）。 */
+  --brand-primary: #059669;
+  --brand-secondary: #10b981;
   --brand-font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', 'Source Han Sans SC',
     'Noto Sans CJK SC', Arial, sans-serif;
