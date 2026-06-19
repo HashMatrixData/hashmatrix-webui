@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { NAV_ITEMS, NAV_LEAVES, DEFAULT_ROUTE, type NavItem } from '@/routes/navConfig';
+import { ROLES, hasAnyRole } from '@hashmatrix/sdk';
+import { NAV_ITEMS, NAV_LEAVES, DEFAULT_ROUTE, filterNavByRole, type NavItem } from '@/routes/navConfig';
 import zhCN from '@/i18n/locales/zh-CN';
 import enUS from '@/i18n/locales/en-US';
 
@@ -80,5 +81,31 @@ describe('导航 i18n（双语解析无漏 key）', () => {
   it('占位页文案双语齐备', () => {
     expect(zhCN.placeholder.comingSoon).toBeTruthy();
     expect(enUS.placeholder.comingSoon).toBeTruthy();
+  });
+});
+
+describe('组织管理角色门控 (#14 · WP4a)', () => {
+  const asAdmin = (r: readonly string[]) => hasAnyRole([ROLES.ADMIN], r);
+  const asViewer = (r: readonly string[]) => hasAnyRole([ROLES.VIEWER], r);
+
+  it('「组织管理」L1 及其 3 个叶子均带 admin 角色门控（路由级守卫的数据来源）', () => {
+    const org = NAV_ITEMS.find((i) => i.path === '/org-admin')!;
+    expect(org.roles).toContain(ROLES.ADMIN);
+    expect(org.children!.every((c) => c.roles?.includes(ROLES.ADMIN))).toBe(true);
+  });
+
+  it('filterNavByRole：无 admin 角色时「组织管理」整组隐藏（菜单级门控）', () => {
+    const viewerTree = filterNavByRole(NAV_ITEMS, asViewer);
+    expect(viewerTree.some((i) => i.path === '/org-admin')).toBe(false);
+    // 非门控模块对 viewer 仍可见，未被误伤（概览 / 数据集成）。
+    expect(viewerTree.some((i) => i.path === '/')).toBe(true);
+    expect(viewerTree.some((i) => i.path === '/data-integration')).toBe(true);
+  });
+
+  it('filterNavByRole：含 admin 角色时「组织管理」及其 3 叶可见', () => {
+    const adminTree = filterNavByRole(NAV_ITEMS, asAdmin);
+    const org = adminTree.find((i) => i.path === '/org-admin');
+    expect(org).toBeDefined();
+    expect(org!.children).toHaveLength(3);
   });
 });

@@ -60,6 +60,18 @@ const PrivacyPage = lazy(() =>
   import('@/modules/privacy/PrivacyPage').then((m) => ({ default: m.PrivacyPage })),
 );
 
+// #14 WP4a · 组织管理（独立 L1 · 租户自管理）：成员 / 角色 / 用户组三叶。叶子在 navConfig 带
+// roles ⇒ leafToRoute 自动以 RequireRole 包裹（路由级守卫兜底）；菜单级隐藏见 filterNavByRole。
+const MembersPage = lazy(() =>
+  import('@/modules/org/members/MembersPage').then((m) => ({ default: m.MembersPage })),
+);
+const RolesPage = lazy(() =>
+  import('@/modules/org/roles/RolesPage').then((m) => ({ default: m.RolesPage })),
+);
+const GroupsPage = lazy(() =>
+  import('@/modules/org/groups/GroupsPage').then((m) => ({ default: m.GroupsPage })),
+);
+
 /** canonical 叶子路径 → 真页（覆盖默认 ModulePlaceholder）。后续页面刀按此 map 增量接入。 */
 const REAL_PAGE_BY_PATH: Record<string, ReactNode> = {
   // #11 数据生产链
@@ -73,6 +85,10 @@ const REAL_PAGE_BY_PATH: Record<string, ReactNode> = {
   '/asset/security/classification': <SecurityPage />,
   '/api-service/developer': <ServicePage />,
   '/privacy/overview': <PrivacyPage />,
+  // #14 组织管理（admin 门控：路由级守卫由 leafToRoute 依叶子 roles 自动施加）
+  '/settings/users': <MembersPage />,
+  '/settings/roles': <RolesPage />,
+  '/settings/user-groups': <GroupsPage />,
 };
 
 const demoRoutes: RouteObject[] = [

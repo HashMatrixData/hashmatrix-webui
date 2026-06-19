@@ -8,7 +8,7 @@ import { useBrandStore } from '@hashmatrix/brand';
 import { useThemeStore } from '@hashmatrix/theme';
 import { useSession, usePermission, isOidcEnabled } from '@hashmatrix/sdk';
 import { LanguageSwitch, ThemeSwitch, BrandSwitch, RoleSwitcher } from '@hashmatrix/ui';
-import { NAV_ITEMS, type NavItem } from '@/routes/navConfig';
+import { NAV_ITEMS, filterNavByRole, type NavItem } from '@/routes/navConfig';
 import { TenantSwitcher } from './TenantSwitcher';
 
 /**
@@ -24,13 +24,6 @@ export function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 递归按角色过滤 L1/L2；子项被滤空的父级一并隐藏（菜单级权限）。
-  const filterByRole = (items: NavItem[]): NavItem[] =>
-    items
-      .filter((item) => can(item.roles ?? []))
-      .map((item) => (item.children ? { ...item, children: filterByRole(item.children) } : item))
-      .filter((item) => !item.children || item.children.length > 0);
-
   // 递归映射为 ProLayout route 树（嵌套子菜单）。
   const toRoutes = (items: NavItem[]): Record<string, unknown>[] =>
     items.map((item) => ({
@@ -40,7 +33,8 @@ export function AppLayout() {
       ...(item.children ? { routes: toRoutes(item.children) } : {}),
     }));
 
-  const route = { path: '/', routes: toRoutes(filterByRole(NAV_ITEMS)) };
+  // 菜单按角色过滤（菜单级=按钮级权限的一种）；高权限路由另由路由级守卫兜底（见 router.tsx）。
+  const route = { path: '/', routes: toRoutes(filterNavByRole(NAV_ITEMS, can)) };
 
   return (
     <ProLayout

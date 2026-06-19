@@ -13,6 +13,7 @@ import {
   LockOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
+import { ROLES } from '@hashmatrix/sdk';
 
 /**
  * 导航/路由单一来源：被 ProLayout 菜单（{@link NAV_ITEMS}）与 React Router 路由
@@ -34,7 +35,9 @@ export interface NavItem {
   labelKey: ParseKeys;
   /** L1 模块携带图标；L2 叶子省略。 */
   icon?: ReactNode;
-  /** 路由级/菜单级所需角色（OR）。缺省 → 任何登录用户。M1 不做门控（见 #14）。 */
+  /** 路由级/菜单级所需角色（OR 语义）。缺省 → 任何登录用户可见。
+   *  门控由 {@link filterNavByRole}（菜单级隐藏）与 router 的 `RequireRole`（路由级兜底）共同消费。
+   *  当前仅「组织管理」按 admin 门控（#14）；其余模块 M1 暂全员可见。 */
   roles?: readonly string[];
   /** L2 子项（M1 菜单深度 ≤ 2）。 */
   children?: NavItem[];
@@ -155,15 +158,17 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
 
-  // 11. 组织管理（独立 L1 · 租户自治；角色门控见 #14）
+  // 11. 组织管理（独立 L1 · 租户自治 · 使用平面租户自管理「≠ admin」）。
+  //     #14 起按 admin 角色门控：L1 + 全部叶子带 roles ⇒ 菜单级隐藏（filterNavByRole）+ 路由级守卫（RequireRole）。
   {
     path: '/org-admin',
     labelKey: 'menu.orgAdmin',
     icon: <TeamOutlined />,
+    roles: [ROLES.ADMIN],
     children: [
-      { path: '/settings/users', labelKey: 'menu.orgMembers' },
-      { path: '/settings/roles', labelKey: 'menu.orgRoles' },
-      { path: '/settings/user-groups', labelKey: 'menu.orgGroups' },
+      { path: '/settings/users', labelKey: 'menu.orgMembers', roles: [ROLES.ADMIN] },
+      { path: '/settings/roles', labelKey: 'menu.orgRoles', roles: [ROLES.ADMIN] },
+      { path: '/settings/user-groups', labelKey: 'menu.orgGroups', roles: [ROLES.ADMIN] },
     ],
   },
 ];
@@ -187,6 +192,21 @@ function collectLeaves(items: NavItem[], acc: NavLeaf[] = []): NavLeaf[] {
 }
 
 export const NAV_LEAVES: NavLeaf[] = collectLeaves(NAV_ITEMS);
+
+/**
+ * 按角色递归过滤导航树（菜单级权限）：滤掉无权限项；子项被滤空的父级一并隐藏。
+ * `can(required)` 为 OR 语义（空 required = 公开），与按钮级 `usePermission` 同源——由
+ * {@link AppLayout} 注入。提取为纯函数以便单测「无角色 ⇒ 组织管理整组消失」（#14）。
+ */
+export function filterNavByRole(
+  items: NavItem[],
+  can: (roles: readonly string[]) => boolean,
+): NavItem[] {
+  return items
+    .filter((item) => can(item.roles ?? []))
+    .map((item) => (item.children ? { ...item, children: filterNavByRole(item.children, can) } : item))
+    .filter((item) => !item.children || item.children.length > 0);
+}
 
 /** 落地/兜底路由：概览。 */
 export const DEFAULT_ROUTE = '/';
