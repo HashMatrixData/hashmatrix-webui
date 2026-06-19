@@ -1,6 +1,7 @@
 /**
  * control-plane 北向契约类型（使用平面消费方 · tolerant reader）。
- * 锚定主仓契约 `contracts/openapi/control-plane-v1.yaml` v1.1.0（registry: openapi/control-plane-v1）。
+ * 锚定主仓契约 `contracts/openapi/control-plane-v1.yaml`（registry: openapi/control-plane-v1；
+ * `/v1/me/tenants` 自 v1.1.0 引入，schema 至今未变）。
  * `packages/sdk` 由契约生成类型落地后，本手写副本应替换为生成类型，避免双源漂移。
  */
 

@@ -7,7 +7,8 @@ import type { MembershipView } from '@/api/types';
 import { TenantSwitcher } from './TenantSwitcher';
 
 // 独立 QueryClient（关闭重试）——本组件用 TanStack Query 取数，全局 preview 未装配 QueryClientProvider。
-// staleTime 默认 0 ⇒ 每次 story 挂载即重取，故不同 story 的 msw override 不会被彼此缓存串味。
+// 两 story 共用此 client、queryKey 相同：跨 story 隔离不靠缓存失效，而靠各自只断言本 story 数据集**独有**
+// 的文本（Default→'Demo Tenant'，MultiTenant→'Acme Demo'），对缓存命中鲁棒；且 play 首尾复位会话租户。
 const storyQueryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
 const meta: Meta<typeof TenantSwitcher> = {
