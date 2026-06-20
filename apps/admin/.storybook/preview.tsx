@@ -1,8 +1,8 @@
 /* eslint-disable react-refresh/only-export-components -- Storybook 预览配置：默认导出 preview 配置而非组件 */
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useMemo, type ReactNode } from 'react';
 import type { Preview } from '@storybook/react-vite';
 import { MemoryRouter } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import '@/index.css';
 import i18n from '@/i18n';
@@ -10,7 +10,6 @@ import { bootstrapBrand } from '@hashmatrix/brand';
 import { configureMockSession, MockSessionProvider, ROLES } from '@hashmatrix/sdk';
 import { useThemeStore, AppConfigProvider, type ThemeMode } from '@hashmatrix/theme';
 import { handlers } from '@/mocks/handlers';
-import { queryClient } from '@/app/queryClient';
 
 initialize({ onUnhandledRequest: 'bypass' }, handlers);
 bootstrapBrand();
@@ -18,6 +17,9 @@ bootstrapBrand();
 configureMockSession({ name: 'Ops Admin', email: 'ops.admin@example.com', roles: [ROLES.SUPERADMIN] });
 
 function StoryProviders({ theme, locale, children }: { theme: ThemeMode; locale: string; children: ReactNode }) {
+  // 每个 story 一个全新 QueryClient——隔离 react-query 缓存，避免上个 story（同 queryKey）的数据
+  // 污染下个 story（否则空/错态 story 会读到 Default 的缓存真数据而假绿/假红）。
+  const queryClient = useMemo(() => new QueryClient({ defaultOptions: { queries: { retry: false } } }), []);
   const setMode = useThemeStore((s) => s.setMode);
   useEffect(() => {
     setMode(theme);

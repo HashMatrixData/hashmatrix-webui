@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Button, Descriptions, Drawer, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
+import { useTableRequest } from '@hashmatrix/ui/data';
 import { listTenants } from '@/api/controlPlane';
 import type { Tenant } from '@/api/types';
 import { TenantStatusTag } from '@/components/TenantStatusTag';
@@ -14,6 +15,15 @@ export function TenantDirectoryPage() {
   const { t } = useTranslation();
   const [detail, setDetail] = useState<Tenant | null>(null);
   const none = t('tenant.none');
+
+  const { request, errorNode } = useTableRequest<Tenant>(
+    (params) =>
+      listTenants({ page: params.current as number, pageSize: params.pageSize as number }).then((r) => ({
+        data: r.items,
+        total: r.total,
+      })),
+    t('common.loadError'),
+  );
 
   const columns: ProColumns<Tenant>[] = [
     { title: t('tenant.colTenantId'), dataIndex: 'tenantId', width: 170 },
@@ -40,6 +50,7 @@ export function TenantDirectoryPage() {
 
   return (
     <>
+      {errorNode}
       <ProTable<Tenant>
         headerTitle={t('tenant.title')}
         rowKey="tenantId"
@@ -48,10 +59,7 @@ export function TenantDirectoryPage() {
         search={false}
         options={{ reload: false, density: true, setting: true }}
         pagination={{ pageSize: 10 }}
-        request={async (params) => {
-          const res = await listTenants({ page: params.current, pageSize: params.pageSize });
-          return { data: res.items, total: res.total, success: true };
-        }}
+        request={request}
       />
       <Drawer open={!!detail} title={t('tenant.detailTitle')} width={460} onClose={() => setDetail(null)}>
         {detail && (

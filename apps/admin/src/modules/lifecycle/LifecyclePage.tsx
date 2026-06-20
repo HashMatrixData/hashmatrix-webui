@@ -1,4 +1,4 @@
-import { App, Button, Card, Popconfirm, Space, Table, Typography, type TableColumnsType } from 'antd';
+import { Alert, App, Button, Card, Popconfirm, Space, Table, Typography, type TableColumnsType } from 'antd';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { deleteTenant, listTenants, resumeTenant, suspendTenant } from '@/api/controlPlane';
@@ -17,7 +17,7 @@ export function LifecyclePage() {
   const { message } = App.useApp();
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['tenants', 'lifecycle'],
     queryFn: () => listTenants({ pageSize: 200 }),
   });
@@ -87,6 +87,9 @@ export function LifecyclePage() {
   return (
     <Card title={t('lifecycle.title')}>
       <Typography.Paragraph type="secondary">{t('lifecycle.intro')}</Typography.Paragraph>
+      {isError && (
+        <Alert type="error" showIcon banner role="alert" style={{ marginBottom: 16 }} message={t('common.loadError')} />
+      )}
       <Table<Tenant>
         rowKey="tenantId"
         loading={isLoading}

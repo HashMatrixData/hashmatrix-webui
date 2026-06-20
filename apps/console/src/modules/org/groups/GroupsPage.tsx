@@ -2,6 +2,7 @@ import { ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Space, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { http } from '@hashmatrix/sdk';
+import { useTableRequest } from '@hashmatrix/ui/data';
 import type { OrgGroup } from '@/mocks/orgGroups';
 
 interface Paged<T> {
@@ -16,6 +17,11 @@ interface Paged<T> {
  */
 export function GroupsPage() {
   const { t } = useTranslation();
+
+  const { request, errorNode } = useTableRequest<OrgGroup>(
+    (params) => http.get<Paged<OrgGroup>>('/api/org/groups', { params }).then((r) => r.data),
+    t('common.loadError'),
+  );
 
   const columns: ProColumns<OrgGroup>[] = [
     { title: t('orgGroups.colName'), dataIndex: 'name', render: (_, r) => <Tag color="blue">{r.name}</Tag> },
@@ -40,6 +46,7 @@ export function GroupsPage() {
         {t('menu.orgGroups')}
       </Typography.Title>
       <Typography.Paragraph type="secondary">{t('orgGroups.intro')}</Typography.Paragraph>
+      {errorNode}
       <ProTable<OrgGroup>
         rowKey="id"
         headerTitle={t('orgGroups.tableTitle')}
@@ -48,12 +55,7 @@ export function GroupsPage() {
         search={false}
         pagination={{ pageSize: 10 }}
         options={{ reload: true, density: true, setting: true }}
-        request={async (params) => {
-          const res = await http.get<Paged<OrgGroup>>('/api/org/groups', {
-            params: { current: params.current, pageSize: params.pageSize },
-          });
-          return { data: res.data.data, total: res.data.total, success: true };
-        }}
+        request={request}
       />
     </Space>
   );

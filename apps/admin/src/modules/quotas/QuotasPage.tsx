@@ -1,4 +1,4 @@
-import { Card, Table, Typography, type TableColumnsType } from 'antd';
+import { Alert, Card, Table, Typography, type TableColumnsType } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { listTenants } from '@/api/controlPlane';
@@ -11,7 +11,7 @@ import type { Tenant } from '@/api/types';
  */
 export function QuotasPage() {
   const { t } = useTranslation();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['tenants', 'quotas'],
     queryFn: () => listTenants({ pageSize: 200 }),
   });
@@ -31,6 +31,9 @@ export function QuotasPage() {
   return (
     <Card title={t('quota.title')}>
       <Typography.Paragraph type="secondary">{t('quota.intro')}</Typography.Paragraph>
+      {isError && (
+        <Alert type="error" showIcon banner role="alert" style={{ marginBottom: 16 }} message={t('common.loadError')} />
+      )}
       <Table<Tenant>
         rowKey="tenantId"
         loading={isLoading}

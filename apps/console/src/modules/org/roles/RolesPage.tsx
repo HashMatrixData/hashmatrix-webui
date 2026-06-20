@@ -2,6 +2,7 @@ import { ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Space, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { http } from '@hashmatrix/sdk';
+import { useTableRequest } from '@hashmatrix/ui/data';
 import type { OrgRole } from '@/mocks/orgRoles';
 
 interface Paged<T> {
@@ -16,6 +17,11 @@ interface Paged<T> {
  */
 export function RolesPage() {
   const { t } = useTranslation();
+
+  const { request, errorNode } = useTableRequest<OrgRole>(
+    (params) => http.get<Paged<OrgRole>>('/api/org/roles', { params }).then((r) => r.data),
+    t('common.loadError'),
+  );
 
   const columns: ProColumns<OrgRole>[] = [
     { title: t('orgRoles.colName'), dataIndex: 'name', render: (_, r) => <Tag>{r.name}</Tag> },
@@ -40,6 +46,7 @@ export function RolesPage() {
         {t('menu.orgRoles')}
       </Typography.Title>
       <Typography.Paragraph type="secondary">{t('orgRoles.intro')}</Typography.Paragraph>
+      {errorNode}
       <ProTable<OrgRole>
         rowKey="id"
         headerTitle={t('orgRoles.tableTitle')}
@@ -48,12 +55,7 @@ export function RolesPage() {
         search={false}
         pagination={{ pageSize: 10 }}
         options={{ reload: true, density: true, setting: true }}
-        request={async (params) => {
-          const res = await http.get<Paged<OrgRole>>('/api/org/roles', {
-            params: { current: params.current, pageSize: params.pageSize },
-          });
-          return { data: res.data.data, total: res.data.total, success: true };
-        }}
+        request={request}
       />
     </Space>
   );

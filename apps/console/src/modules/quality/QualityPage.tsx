@@ -3,6 +3,7 @@ import { ProTable, StatisticCard, type ProColumns } from '@ant-design/pro-compon
 import { Badge, Space, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { http } from '@hashmatrix/sdk';
+import { useTableRequest } from '@hashmatrix/ui/data';
 import { QUALITY_RULES, type QualityRuleRow } from '@/mocks/quality';
 
 interface PagedResult {
@@ -40,6 +41,11 @@ const PASS_RATE = ((QUALITY_RULES.filter((r) => r.status === 'pass').length / TO
  */
 export function QualityPage() {
   const { t } = useTranslation();
+
+  const { request, errorNode } = useTableRequest<QualityRuleRow>(
+    (params) => http.get<PagedResult>('/api/quality-rules', { params }).then((r) => r.data),
+    t('common.loadError'),
+  );
 
   const columns: ProColumns<QualityRuleRow>[] = [
     { title: t('quality.colName'), dataIndex: 'name' },
@@ -91,6 +97,7 @@ export function QualityPage() {
         <StatisticCard statistic={{ title: t('quality.kpiCoverage'), value: 87, suffix: '%' }} />
       </StatisticCard.Group>
 
+      {errorNode}
       <ProTable<QualityRuleRow>
         rowKey="id"
         headerTitle={t('quality.rulesCardTitle')}
@@ -99,13 +106,7 @@ export function QualityPage() {
         pagination={{ pageSize: 10, showSizeChanger: true }}
         search={{ labelWidth: 'auto' }}
         options={{ reload: true, density: true, setting: true }}
-        request={async (params) => {
-          const { current, pageSize, name } = params;
-          const res = await http.get<PagedResult>('/api/quality-rules', {
-            params: { current, pageSize, name },
-          });
-          return { data: res.data.data, total: res.data.total, success: true };
-        }}
+        request={request}
       />
     </Space>
   );

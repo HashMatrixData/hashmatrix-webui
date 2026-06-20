@@ -9,6 +9,7 @@ const baseZhCN = {
     confirm: '确定',
     cancel: '取消',
     save: '保存',
+    loadError: '数据加载失败，请稍后重试',
     poweredBy: '由 {{companyName}} 提供',
   },
   language: {

@@ -1,4 +1,4 @@
-import { Card, Space, Table, Tag, Typography, type TableColumnsType } from 'antd';
+import { Alert, Card, Space, Table, Tag, Typography, type TableColumnsType } from 'antd';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { ParseKeys } from 'i18next';
@@ -26,7 +26,7 @@ const STEP: Record<ProvisioningStepStatus, { color: string; key: ParseKeys }> = 
  */
 export function ProvisioningPage() {
   const { t } = useTranslation();
-  const { data = [], isLoading } = useQuery({
+  const { data = [], isLoading, isError } = useQuery({
     queryKey: ['provisioning'],
     queryFn: async () => {
       const { items } = await listTenants({ pageSize: 200 });
@@ -67,6 +67,9 @@ export function ProvisioningPage() {
   return (
     <Card title={t('provision.title')}>
       <Typography.Paragraph type="secondary">{t('provision.intro')}</Typography.Paragraph>
+      {isError && (
+        <Alert type="error" showIcon banner role="alert" style={{ marginBottom: 16 }} message={t('common.loadError')} />
+      )}
       <Table<ProvisioningStatus>
         rowKey="tenantId"
         loading={isLoading}

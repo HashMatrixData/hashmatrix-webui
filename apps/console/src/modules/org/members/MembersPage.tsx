@@ -4,6 +4,7 @@ import { Badge, Button, Space, Tag, Typography } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { http, PermissionGuard, ROLES } from '@hashmatrix/sdk';
+import { useTableRequest } from '@hashmatrix/ui/data';
 import type { OrgMember } from '@/mocks/orgMembers';
 
 interface Paged<T> {
@@ -29,6 +30,11 @@ const STATUS_BADGE: Record<
  */
 export function MembersPage() {
   const { t } = useTranslation();
+
+  const { request, errorNode } = useTableRequest<OrgMember>(
+    (params) => http.get<Paged<OrgMember>>('/api/org/members', { params }).then((r) => r.data),
+    t('common.loadError'),
+  );
 
   const columns: ProColumns<OrgMember>[] = [
     { title: t('orgMembers.colName'), dataIndex: 'name' },
@@ -75,6 +81,7 @@ export function MembersPage() {
         {t('menu.orgMembers')}
       </Typography.Title>
       <Typography.Paragraph type="secondary">{t('orgMembers.intro')}</Typography.Paragraph>
+      {errorNode}
       <ProTable<OrgMember>
         rowKey="id"
         headerTitle={t('orgMembers.tableTitle')}
@@ -90,13 +97,7 @@ export function MembersPage() {
             </Button>
           </PermissionGuard>,
         ]}
-        request={async (params) => {
-          const { current, pageSize, name } = params;
-          const res = await http.get<Paged<OrgMember>>('/api/org/members', {
-            params: { current, pageSize, name },
-          });
-          return { data: res.data.data, total: res.data.total, success: true };
-        }}
+        request={request}
       />
     </Space>
   );

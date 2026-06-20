@@ -6,6 +6,7 @@ const baseEnUS: BaseResources = {
     confirm: 'OK',
     cancel: 'Cancel',
     save: 'Save',
+    loadError: 'Failed to load data. Please try again.',
     poweredBy: 'Powered by {{companyName}}',
   },
   language: {

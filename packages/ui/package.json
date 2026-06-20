@@ -6,7 +6,8 @@
   "description": "设计系统：通用控件（语言/明暗/换肤/角色）+ AntV 画布组件（血缘/DAG/大屏）+ 共享 hooks。两 app 共享。",
   "exports": {
     ".": "./src/index.ts",
-    "./controls": "./src/controls/index.ts"
+    "./controls": "./src/controls/index.ts",
+    "./data": "./src/data/index.ts"
   },
   "types": "./src/index.ts",
   "dependencies": {

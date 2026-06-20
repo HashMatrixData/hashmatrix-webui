@@ -18,7 +18,7 @@ export function ApprovalsPage() {
   const { message } = App.useApp();
   const qc = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['tenants', 'approvals'],
     queryFn: () => listTenants({ pageSize: 200 }),
   });
@@ -115,6 +115,9 @@ export function ApprovalsPage() {
   return (
     <Card title={t('approval.title')}>
       <Typography.Paragraph type="secondary">{t('approval.intro')}</Typography.Paragraph>
+      {isError && (
+        <Alert type="error" showIcon banner role="alert" style={{ marginBottom: 16 }} message={t('common.loadError')} />
+      )}
       <Table<Tenant>
         rowKey="tenantId"
         loading={isLoading}
