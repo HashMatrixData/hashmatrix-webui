@@ -12,6 +12,7 @@ const consoleEnUS: ConsoleResources = {
     relationship: 'Relationships',
     classification: 'Classifications',
     templates: 'Templates',
+    validation: 'Validation',
   },
   demo: {
     title: 'Three-Switch Demo',
@@ -136,6 +137,33 @@ const consoleEnUS: ConsoleResources = {
     importConfirm: 'Import this template family ({{count}} metaclasses)? Existing codes will be skipped.',
     importDone: 'Imported: {{created}} created, {{skipped}} skipped',
     importFail: 'Import failed',
+  },
+  validation: {
+    mockBadge: 'Mock data · metamodel engine is post-M1',
+    pageDesc:
+      'Scan the current metamodel for consistency: unique codes, existing supertypes, no inheritance cycles, complete relationship endpoints. Basis for the pre-publish gate. The backend engine is under construction; data is mocked for now.',
+    recheck: 'Re-check',
+    passTitle: 'Validation passed',
+    failTitle: '{{errors}} issue(s) found',
+    checkedDesc: 'Checked {{count}} items (metaclasses + relationships).',
+    rulesTitle: 'Validation rules',
+    rulePass: 'Pass',
+    ruleHit: '{{count}} hit(s)',
+    issuesTitle: 'Issues',
+    colSeverity: 'Severity',
+    colRule: 'Rule',
+    colTarget: 'Target',
+    colDetail: 'Detail',
+    severity: {
+      error: 'Error',
+      warning: 'Warning',
+    },
+    rule: {
+      uniqueCode: 'Unique code',
+      superExists: 'Supertype exists',
+      noCycle: 'No inheritance cycle',
+      relEndpoint: 'Relationship endpoints',
+    },
   },
   classification: {
     mockBadge: 'Mock data · metamodel engine is post-M1',

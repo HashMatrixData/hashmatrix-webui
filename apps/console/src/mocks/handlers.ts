@@ -5,6 +5,7 @@ import { TYPEDEF_VERSIONS, recordVersion, type TypeDefVersion } from './typedefV
 import { RELATIONSHIPS } from './relationships';
 import { CLASSIFICATIONS, findClassification, type ClassificationNode } from './classifications';
 import { TEMPLATES } from './templates';
+import { validateModel } from './validation';
 
 /** mock「服务端」为新建元类派生的固定时间戳（确定性，便于 E2E）。 */
 const MOCK_CREATED_AT = '2026-06-22T00:00:00.000Z';
@@ -205,5 +206,10 @@ export const handlers = [
       created += 1;
     }
     return HttpResponse.json({ data: { created, skipped, total: template.typeDefs.length }, success: true });
+  }),
+
+  // 一致性校验（#9）：扫描当前元模型，返回问题清单 + 规则命中汇总。
+  http.get('*/api/meta/validate', () => {
+    return HttpResponse.json({ data: validateModel(), success: true });
   }),
 ];
