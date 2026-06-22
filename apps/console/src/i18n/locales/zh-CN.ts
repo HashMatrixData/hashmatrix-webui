@@ -15,6 +15,7 @@ const consoleZhCN = {
     instance: '元数据实例',
     metaLineage: '血缘分析',
     collect: '采集衔接',
+    events: '变更事件',
   },
   demo: {
     title: '三开关 Demo',
@@ -252,6 +253,22 @@ const consoleZhCN = {
       bulkDrop: '批量删表',
       schemaShift: '结构突变',
       typeConflict: '字段类型冲突',
+    },
+  },
+  events: {
+    mockBadge: 'Mock 数据 · 元模型引擎 post-M1',
+    pageDesc: 'governance 对外发布的异步元数据变更事件（Kafka topic）只读观测：元模型变更 / 采集异动 / 实例变更。后端引擎建设中，当前为 mock 数据。',
+    listCardTitle: '事件流（ChangeEvent · 服务端分页）',
+    colType: '事件类型',
+    colTopic: 'Topic',
+    colSubject: '主体',
+    colTime: '时间',
+    colSummary: '摘要',
+    detailTitle: '事件详情',
+    type: {
+      modelChanged: '元模型变更',
+      collectAnomaly: '采集异动',
+      instanceChanged: '实例变更',
     },
   },
   classification: {

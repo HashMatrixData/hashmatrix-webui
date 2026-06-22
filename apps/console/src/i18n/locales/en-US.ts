@@ -16,6 +16,7 @@ const consoleEnUS: ConsoleResources = {
     instance: 'Instances',
     metaLineage: 'Lineage',
     collect: 'Collection',
+    events: 'Events',
   },
   demo: {
     title: 'Three-Switch Demo',
@@ -260,6 +261,23 @@ const consoleEnUS: ConsoleResources = {
       bulkDrop: 'Bulk drop',
       schemaShift: 'Schema shift',
       typeConflict: 'Type conflict',
+    },
+  },
+  events: {
+    mockBadge: 'Mock data · metamodel engine is post-M1',
+    pageDesc:
+      'Read-only view of governance’s async metadata change events (Kafka topics): model changed / collection anomaly / instance changed. The backend engine is under construction; data is mocked for now.',
+    listCardTitle: 'Event stream (ChangeEvent · server-side pagination)',
+    colType: 'Event type',
+    colTopic: 'Topic',
+    colSubject: 'Subject',
+    colTime: 'Time',
+    colSummary: 'Summary',
+    detailTitle: 'Event detail',
+    type: {
+      modelChanged: 'Model changed',
+      collectAnomaly: 'Collection anomaly',
+      instanceChanged: 'Instance changed',
     },
   },
   classification: {

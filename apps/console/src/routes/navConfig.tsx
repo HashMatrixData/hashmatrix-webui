@@ -15,6 +15,7 @@ import {
   TableOutlined,
   ShareAltOutlined,
   ScanOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { ROLES } from '@hashmatrix/sdk';
 
@@ -49,6 +50,7 @@ export const NAV_ITEMS: NavItem[] = [
       { path: '/metadata/instance', labelKey: 'menu.instance', icon: <TableOutlined /> },
       { path: '/metadata/lineage', labelKey: 'menu.metaLineage', icon: <ShareAltOutlined /> },
       { path: '/metadata/collect', labelKey: 'menu.collect', icon: <ScanOutlined /> },
+      { path: '/metadata/events', labelKey: 'menu.events', icon: <ThunderboltOutlined /> },
     ],
   },
   {

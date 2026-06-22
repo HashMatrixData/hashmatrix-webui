@@ -49,6 +49,9 @@ const LineageAnalysisPage = lazy(() =>
 const CollectPage = lazy(() =>
   import('@/modules/metadata/collect/CollectPage').then((m) => ({ default: m.CollectPage })),
 );
+const EventsPage = lazy(() =>
+  import('@/modules/metadata/events/EventsPage').then((m) => ({ default: m.EventsPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -81,6 +84,7 @@ export const router = createBrowserRouter([
           { path: 'instance', element: <InstancePage /> },
           { path: 'lineage', element: <LineageAnalysisPage /> },
           { path: 'collect', element: <CollectPage /> },
+          { path: 'events', element: <EventsPage /> },
         ],
       },
       {

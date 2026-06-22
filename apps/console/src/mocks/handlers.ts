@@ -9,6 +9,7 @@ import { validateModel } from './validation';
 import { INSTANCES, INSTANCE_HISTORY } from './instances';
 import { LINEAGE_GRAPH } from './lineage';
 import { COLLECT_SOURCES, SCAN_RUNS, runScan } from './collect';
+import { CHANGE_EVENTS } from './events';
 
 /** mock「当前用户」（认领人占位，脱敏）。 */
 const MOCK_CURRENT_USER = 'tenant-demo';
@@ -287,5 +288,19 @@ export const handlers = [
       return HttpResponse.json({ message: '数据源连接异常，无法扫描' }, { status: 409 });
     }
     return HttpResponse.json({ data: runScan(source), success: true }, { status: 201 });
+  }),
+
+  // 元数据变更事件流（#16）：服务端分页 + type 过滤（只读观测）。
+  http.get('*/api/meta/events', ({ request }) => {
+    const url = new URL(request.url);
+    const current = Number(url.searchParams.get('current') ?? '1');
+    const pageSize = Number(url.searchParams.get('pageSize') ?? '10');
+    const type = (url.searchParams.get('type') ?? '').trim();
+
+    const filtered = type ? CHANGE_EVENTS.filter((e) => e.type === type) : CHANGE_EVENTS;
+    const start = (current - 1) * pageSize;
+    const data = filtered.slice(start, start + pageSize);
+
+    return HttpResponse.json({ data, total: filtered.length, success: true });
   }),
 ];
