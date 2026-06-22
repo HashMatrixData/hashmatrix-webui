@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { MetadataTabsPage } from './MetadataTabsPage';
+import { MetamodelDesignerPage } from './designer/MetamodelDesignerPage';
 import { MetamodelPage } from './metamodel/MetamodelPage';
 import { RelationshipPage } from './relationship/RelationshipPage';
 import { ClassificationPage } from './classification/ClassificationPage';
@@ -7,13 +8,15 @@ import { ValidationPage } from './validation/ValidationPage';
 import { TemplatesPage } from './templates/TemplatesPage';
 
 /**
- * 元模型设计器（建模平面）：元模型 / 关系 / 分类 / 校验 / 模板，归为一个工作台的多个 Tab。
+ * 元模型设计器（建模平面）：以「设计器」画布工作台为主视图（内容级合并），
+ * 元模型 / 关系 / 分类 / 校验 / 模板 列表形态作为细化编辑 Tab 并存。
  */
 export function ModelingPage() {
   const { t } = useTranslation();
   return (
     <MetadataTabsPage
       tabs={[
+        { key: 'designer', label: t('menu.designer'), children: <MetamodelDesignerPage /> },
         { key: 'metamodel', label: t('menu.metamodel'), children: <MetamodelPage /> },
         { key: 'relationship', label: t('menu.relationship'), children: <RelationshipPage /> },
         { key: 'classification', label: t('menu.classification'), children: <ClassificationPage /> },
