@@ -13,6 +13,7 @@ const consoleZhCN = {
     templates: '模板库',
     validation: '一致性校验',
     instance: '元数据实例',
+    metaLineage: '血缘分析',
   },
   demo: {
     title: '三开关 Demo',
@@ -189,6 +190,16 @@ const consoleZhCN = {
       active: '活跃',
       deprecated: '已废弃',
     },
+  },
+  metaLineage: {
+    mockBadge: 'Mock 数据 · 元模型引擎 post-M1',
+    pageDesc: '表级血缘图 + 影响分析：选择焦点资产，高亮其下游受影响资产。后端引擎建设中，当前为 mock 数据。',
+    focusLabel: '焦点资产',
+    graphTitle: '血缘图',
+    impactTitle: '下游影响',
+    impactDesc: '焦点资产沿血缘下游可达的受影响资产（变更/下线时需评估）。',
+    noImpact: '无下游影响',
+    legendImpacted: '受影响（下游）',
   },
   classification: {
     mockBadge: 'Mock 数据 · 元模型引擎 post-M1',

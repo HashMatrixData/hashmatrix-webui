@@ -41,6 +41,11 @@ const ValidationPage = lazy(() =>
 const InstancePage = lazy(() =>
   import('@/modules/metadata/instance/InstancePage').then((m) => ({ default: m.InstancePage })),
 );
+const LineageAnalysisPage = lazy(() =>
+  import('@/modules/metadata/lineage/LineageAnalysisPage').then((m) => ({
+    default: m.LineageAnalysisPage,
+  })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -71,6 +76,7 @@ export const router = createBrowserRouter([
           { path: 'templates', element: <TemplatesPage /> },
           { path: 'validation', element: <ValidationPage /> },
           { path: 'instance', element: <InstancePage /> },
+          { path: 'lineage', element: <LineageAnalysisPage /> },
         ],
       },
       {

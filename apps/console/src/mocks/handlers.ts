@@ -7,6 +7,7 @@ import { CLASSIFICATIONS, findClassification, type ClassificationNode } from './
 import { TEMPLATES } from './templates';
 import { validateModel } from './validation';
 import { INSTANCES, INSTANCE_HISTORY } from './instances';
+import { LINEAGE_GRAPH } from './lineage';
 
 /** mock「当前用户」（认领人占位，脱敏）。 */
 const MOCK_CURRENT_USER = 'tenant-demo';
@@ -257,5 +258,10 @@ export const handlers = [
     }
     INSTANCES[idx] = { ...INSTANCES[idx], claimedBy: MOCK_CURRENT_USER };
     return HttpResponse.json({ data: INSTANCES[idx], success: true });
+  }),
+
+  // 血缘图（#15）：返回表级血缘 DAG，影响分析在前端按 focus 节点计算下游。
+  http.get('*/api/meta/lineage', () => {
+    return HttpResponse.json({ data: LINEAGE_GRAPH, success: true });
   }),
 ];

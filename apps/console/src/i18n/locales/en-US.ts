@@ -14,6 +14,7 @@ const consoleEnUS: ConsoleResources = {
     templates: 'Templates',
     validation: 'Validation',
     instance: 'Instances',
+    metaLineage: 'Lineage',
   },
   demo: {
     title: 'Three-Switch Demo',
@@ -195,6 +196,17 @@ const consoleEnUS: ConsoleResources = {
       active: 'Active',
       deprecated: 'Deprecated',
     },
+  },
+  metaLineage: {
+    mockBadge: 'Mock data · metamodel engine is post-M1',
+    pageDesc:
+      'Table-level lineage graph + impact analysis: pick a focus asset to highlight its downstream impacted assets. The backend engine is under construction; data is mocked for now.',
+    focusLabel: 'Focus asset',
+    graphTitle: 'Lineage graph',
+    impactTitle: 'Downstream impact',
+    impactDesc: 'Assets reachable downstream from the focus asset (assess before change/decommission).',
+    noImpact: 'No downstream impact',
+    legendImpacted: 'Impacted (downstream)',
   },
   classification: {
     mockBadge: 'Mock data · metamodel engine is post-M1',
