@@ -6,6 +6,10 @@ import { RELATIONSHIPS } from './relationships';
 import { CLASSIFICATIONS, findClassification, type ClassificationNode } from './classifications';
 import { TEMPLATES } from './templates';
 import { validateModel } from './validation';
+import { INSTANCES, INSTANCE_HISTORY } from './instances';
+
+/** mock「当前用户」（认领人占位，脱敏）。 */
+const MOCK_CURRENT_USER = 'tenant-demo';
 
 /** mock「服务端」为新建元类派生的固定时间戳（确定性，便于 E2E）。 */
 const MOCK_CREATED_AT = '2026-06-22T00:00:00.000Z';
@@ -211,5 +215,47 @@ export const handlers = [
   // 一致性校验（#9）：扫描当前元模型，返回问题清单 + 规则命中汇总。
   http.get('*/api/meta/validate', () => {
     return HttpResponse.json({ data: validateModel(), success: true });
+  }),
+
+  // 元数据实例检索（#13）：服务端分页 + keyword / typeName 过滤。
+  http.get('*/api/meta/instances', ({ request }) => {
+    const url = new URL(request.url);
+    const current = Number(url.searchParams.get('current') ?? '1');
+    const pageSize = Number(url.searchParams.get('pageSize') ?? '10');
+    const keyword = (url.searchParams.get('keyword') ?? '').trim().toLowerCase();
+    const typeName = (url.searchParams.get('typeName') ?? '').trim();
+
+    const filtered = INSTANCES.filter((it) => {
+      const hitKeyword =
+        !keyword ||
+        it.qualifiedName.toLowerCase().includes(keyword) ||
+        it.displayName.toLowerCase().includes(keyword);
+      const hitType = !typeName || it.typeName === typeName;
+      return hitKeyword && hitType;
+    });
+    const start = (current - 1) * pageSize;
+    const data = filtered.slice(start, start + pageSize);
+
+    return HttpResponse.json({ data, total: filtered.length, success: true });
+  }),
+
+  // 实例历史快照（#13）。
+  http.get('*/api/meta/instances/:guid/history', ({ params }) => {
+    const guid = String(params.guid);
+    return HttpResponse.json({ data: INSTANCE_HISTORY[guid] ?? [], success: true });
+  }),
+
+  // 实例认领（#13）：未认领→落当前用户；已认领→409。
+  http.post('*/api/meta/instances/:guid/claim', ({ params }) => {
+    const guid = String(params.guid);
+    const idx = INSTANCES.findIndex((it) => it.guid === guid);
+    if (idx < 0) {
+      return HttpResponse.json({ message: `实例不存在：${guid}` }, { status: 404 });
+    }
+    if (INSTANCES[idx].claimedBy) {
+      return HttpResponse.json({ message: `已被认领：${INSTANCES[idx].claimedBy}` }, { status: 409 });
+    }
+    INSTANCES[idx] = { ...INSTANCES[idx], claimedBy: MOCK_CURRENT_USER };
+    return HttpResponse.json({ data: INSTANCES[idx], success: true });
   }),
 ];

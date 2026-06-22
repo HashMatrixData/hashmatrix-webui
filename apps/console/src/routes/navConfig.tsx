@@ -12,6 +12,7 @@ import {
   TagsOutlined,
   AppstoreAddOutlined,
   SafetyCertificateOutlined,
+  TableOutlined,
 } from '@ant-design/icons';
 import { ROLES } from '@hashmatrix/sdk';
 
@@ -43,6 +44,7 @@ export const NAV_ITEMS: NavItem[] = [
       { path: '/metadata/classification', labelKey: 'menu.classification', icon: <TagsOutlined /> },
       { path: '/metadata/templates', labelKey: 'menu.templates', icon: <AppstoreAddOutlined /> },
       { path: '/metadata/validation', labelKey: 'menu.validation', icon: <SafetyCertificateOutlined /> },
+      { path: '/metadata/instance', labelKey: 'menu.instance', icon: <TableOutlined /> },
     ],
   },
   {

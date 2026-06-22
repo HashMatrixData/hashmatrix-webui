@@ -38,6 +38,9 @@ const TemplatesPage = lazy(() =>
 const ValidationPage = lazy(() =>
   import('@/modules/metadata/validation/ValidationPage').then((m) => ({ default: m.ValidationPage })),
 );
+const InstancePage = lazy(() =>
+  import('@/modules/metadata/instance/InstancePage').then((m) => ({ default: m.InstancePage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +70,7 @@ export const router = createBrowserRouter([
           { path: 'classification', element: <ClassificationPage /> },
           { path: 'templates', element: <TemplatesPage /> },
           { path: 'validation', element: <ValidationPage /> },
+          { path: 'instance', element: <InstancePage /> },
         ],
       },
       {
