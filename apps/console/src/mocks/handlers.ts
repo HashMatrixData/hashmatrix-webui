@@ -8,6 +8,7 @@ import { TEMPLATES } from './templates';
 import { validateModel } from './validation';
 import { INSTANCES, INSTANCE_HISTORY } from './instances';
 import { LINEAGE_GRAPH } from './lineage';
+import { COLLECT_SOURCES, SCAN_RUNS, runScan } from './collect';
 
 /** mock「当前用户」（认领人占位，脱敏）。 */
 const MOCK_CURRENT_USER = 'tenant-demo';
@@ -263,5 +264,28 @@ export const handlers = [
   // 血缘图（#15）：返回表级血缘 DAG，影响分析在前端按 focus 节点计算下游。
   http.get('*/api/meta/lineage', () => {
     return HttpResponse.json({ data: LINEAGE_GRAPH, success: true });
+  }),
+
+  // 采集数据源（#14）。
+  http.get('*/api/meta/collect/sources', () => {
+    return HttpResponse.json({ data: COLLECT_SOURCES, success: true });
+  }),
+
+  // 扫描运行列表（#14）：含变更集 + 异动（按时间倒序）。
+  http.get('*/api/meta/collect/runs', () => {
+    return HttpResponse.json({ data: SCAN_RUNS, success: true });
+  }),
+
+  // 触发结构扫描（#14）：生成一次运行；数据源不存在→404，连接异常→409。
+  http.post('*/api/meta/collect/sources/:id/scan', ({ params }) => {
+    const id = String(params.id);
+    const source = COLLECT_SOURCES.find((s) => s.id === id);
+    if (!source) {
+      return HttpResponse.json({ message: `数据源不存在：${id}` }, { status: 404 });
+    }
+    if (source.status === 'ERROR') {
+      return HttpResponse.json({ message: '数据源连接异常，无法扫描' }, { status: 409 });
+    }
+    return HttpResponse.json({ data: runScan(source), success: true }, { status: 201 });
   }),
 ];

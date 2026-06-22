@@ -14,6 +14,7 @@ import {
   SafetyCertificateOutlined,
   TableOutlined,
   ShareAltOutlined,
+  ScanOutlined,
 } from '@ant-design/icons';
 import { ROLES } from '@hashmatrix/sdk';
 
@@ -47,6 +48,7 @@ export const NAV_ITEMS: NavItem[] = [
       { path: '/metadata/validation', labelKey: 'menu.validation', icon: <SafetyCertificateOutlined /> },
       { path: '/metadata/instance', labelKey: 'menu.instance', icon: <TableOutlined /> },
       { path: '/metadata/lineage', labelKey: 'menu.metaLineage', icon: <ShareAltOutlined /> },
+      { path: '/metadata/collect', labelKey: 'menu.collect', icon: <ScanOutlined /> },
     ],
   },
   {

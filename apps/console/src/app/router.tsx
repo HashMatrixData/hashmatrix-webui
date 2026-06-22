@@ -46,6 +46,9 @@ const LineageAnalysisPage = lazy(() =>
     default: m.LineageAnalysisPage,
   })),
 );
+const CollectPage = lazy(() =>
+  import('@/modules/metadata/collect/CollectPage').then((m) => ({ default: m.CollectPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -77,6 +80,7 @@ export const router = createBrowserRouter([
           { path: 'validation', element: <ValidationPage /> },
           { path: 'instance', element: <InstancePage /> },
           { path: 'lineage', element: <LineageAnalysisPage /> },
+          { path: 'collect', element: <CollectPage /> },
         ],
       },
       {
