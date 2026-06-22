@@ -2,7 +2,6 @@
 export { LanguageSwitch, ThemeSwitch, BrandSwitch, RoleSwitcher } from './controls';
 export { LineageGraph } from './canvas/lineage/LineageGraph';
 export { DagGraph } from './canvas/dag/DagGraph';
-export { ScaleContainer } from './canvas/bigscreen/ScaleContainer';
 export { TrendChart } from './canvas/bigscreen/TrendChart';
 export { getCanvasTheme, type CanvasTheme } from './canvas/canvasTheme';
 export { useContainerSize, type Size } from './hooks/useContainerSize';

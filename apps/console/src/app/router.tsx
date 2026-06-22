@@ -18,9 +18,6 @@ const LineagePage = lazy(() =>
 const OrchestrationPage = lazy(() =>
   import('@/modules/orchestration/OrchestrationPage').then((m) => ({ default: m.OrchestrationPage })),
 );
-const DashboardPage = lazy(() =>
-  import('@/modules/dashboard/DashboardPage').then((m) => ({ default: m.DashboardPage })),
-);
 const GovernancePage = lazy(() =>
   import('@/modules/governance/GovernancePage').then((m) => ({ default: m.GovernancePage })),
 );
@@ -95,7 +92,6 @@ const demoRoutes: RouteObject[] = [
   { path: 'playground', element: <PlaygroundPage /> },
   { path: 'lineage', element: <LineagePage /> },
   { path: 'orchestration', element: <OrchestrationPage /> },
-  { path: 'dashboard', element: <DashboardPage /> },
   {
     path: 'governance',
     element: (

@@ -5,7 +5,7 @@
 
 ## 0. 目标与范围
 
-数据治理 / 数据中台的**全站统一前端**。WebUI 是本平台**唯一前端仓**——其余 submodule（governance / security / tools-bi / privacy / data-foundation / gateway / platform-common）均为无界面后端服务。本轮只做**技术选型 + 初始化脚手架**，不实现业务功能。
+数据治理 / 数据中台的**全站统一前端**。WebUI 是本平台**唯一前端仓**——其余 submodule（governance / security / privacy / data-foundation / gateway / platform-common）均为无界面后端服务。本轮只做**技术选型 + 初始化脚手架**，不实现业务功能。
 
 ### 双平面（同仓双 app）
 
@@ -13,7 +13,7 @@
 
 | App | 平面 | 受众 / 身份 | 对接后端 | 品牌 | 拓扑 |
 |-----|------|-----------|---------|------|------|
-| `apps/console` | **使用平面** · 租户控制台 | 租户用户（JWT 带 `tenant`，**org 作用域**） | governance / security / tools-bi / privacy / data-foundation | 部署级白标 | per-tenant / 按 org 多租户 |
+| `apps/console` | **使用平面** · 租户控制台 | 租户用户（JWT 带 `tenant`，**org 作用域**） | governance / security / privacy / data-foundation | 部署级白标 | per-tenant / 按 org 多租户 |
 | `apps/admin` | **管理平面** · 运营控制台 | 平台运营方（**跨租户** superadmin，不绑租户） | 主要 `control-plane` | 部署级（SaaS=我们品牌 / 私有化=客户品牌） | **跨租户单例**，独立域名 |
 
 - **为何拆两个 app**：受众与身份不同（租户用户 vs 跨租户运营方）、拓扑不同（per-tenant vs 单例）、**安全爆炸半径**不同——admin 含「开通/销毁租户、改配额、看全租户」高权限操作，其 bundle **绝不能与租户用户同包**。两个 app 各自构建产物 → 两个 Nginx 镜像 / 两个域名，互不可达。
@@ -85,8 +85,6 @@
 |------|-----------------|-------------|
 | 元数据 / 数据血缘 | OpenMetadata | **原生自研**（血缘 G6 + 元数据管理） |
 | 作业编排 / 调度 | DolphinScheduler | 上游引擎 + **原生 DAG 编排画布（X6）** |
-| 数据大屏 | 取数 API | **原生大屏编辑器**（scale 容器 + G2） |
-| BI / 报表 | DataEase / Superset | 报表设计器**集成纳入**（iframe + SSO + 品牌化外框）；取数 API 复用 |
 | 隐私计算 | 隐语 SecretFlow / SecretPad | **集成纳入**（iframe + SSO + 品牌化外框） |
 | 数据治理 / 安全 / 数据基础 核心流程 | 平台自研后端 | **原生自研** |
 
@@ -173,10 +171,9 @@ hashmatrix-webui/
 3. i18n（zh-CN/en-US）+ 明暗主题 + **三开关 demo**（语言 / 明暗 / 换肤）打通。
 4. Keycloak OIDC 登录壳 + ProLayout 导航 + 路由级/按钮级权限骨架。
 5. 画布封装样例：血缘（G6）+ DAG 编排（X6）各一个最小可运行 demo，强调色随品牌。
-6. 数据大屏 `scale` 自适应容器 demo（G2 图表）。
-7. **Storybook**：接入 Vite builder；为已建组件 + 关键页面补 story；msw 提供 mock 数据使 story 自含。
-8. **E2E**：`@storybook/test-runner`（Playwright）跑在 Storybook 之上，story 即夹具，免备后端环境。
-9. CI：lint + Vitest + Storybook 构建 + Playwright(基于 Storybook) E2E + build；`deploy/`（Dockerfile + nginx + `config.js` 模板）。
+6. **Storybook**：接入 Vite builder；为已建组件 + 关键页面补 story；msw 提供 mock 数据使 story 自含。
+7. **E2E**：`@storybook/test-runner`（Playwright）跑在 Storybook 之上，story 即夹具，免备后端环境。
+8. CI：lint + Vitest + Storybook 构建 + Playwright(基于 Storybook) E2E + build；`deploy/`（Dockerfile + nginx + `config.js` 模板）。
 10. 更新 README / CLAUDE.md 技术栈段；提交推送；记忆落档。
 
 > **分两阶段交付**：上述 1–10 聚焦 `apps/console`（使用平面，Issue #1）。`apps/admin`（管理平面，Issue #3）在 #1 完成后增量接入：

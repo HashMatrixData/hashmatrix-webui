@@ -48,7 +48,6 @@ const consoleEnUS: ConsoleResources = {
     orgRoles: 'Roles & Permissions',
     orgGroups: 'User Groups',
     // —— WP0 capability demos (retained · not in canonical nav; still referenced by demo pages) ——
-    dashboard: 'Dashboard',
     lineage: 'Data Lineage',
     orchestration: 'DAG Orchestration',
     playground: 'Three-Switch Demo',
@@ -240,11 +239,6 @@ const consoleEnUS: ConsoleResources = {
     colMembers: 'Members',
     colRoles: 'Bound Roles',
     colDesc: 'Description',
-  },
-  dashboard: {
-    datasets: 'Datasets',
-    jobs: 'Jobs',
-    quality: 'Quality',
   },
 };
 

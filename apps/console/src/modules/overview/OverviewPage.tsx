@@ -7,8 +7,7 @@ import { DATASETS } from '@/mocks/datasets';
 
 /**
  * 租户概览（落地首页 · canonical 叶子 `/`）。
- * 复用 `packages/ui` 大屏 `TrendChart` + ProComponents `StatisticCard` 组合为使用平面着陆页；
- * 全屏 1920×1080 `ScaleContainer` 大屏见保留的 `/dashboard` 演示页（同一图元，按场景取舍）。
+ * 复用 `packages/ui` `TrendChart` + ProComponents `StatisticCard` 组合为使用平面着陆页。
  */
 const KPIS: { titleKey: ParseKeys; value: number; suffix: string }[] = [
   // 数据集数与 mock 目录（DatasetTable）同源，演示数据自洽。
@@ -38,7 +37,7 @@ export function OverviewPage() {
       </StatisticCard.Group>
 
       <ProCard title={t('overview.trendTitle')}>
-        {/* TrendChart 为 G2 autoFit（height:100%），需显式定高祖先方能渲染——对照 DashboardPage 的定高用法。 */}
+        {/* TrendChart 为 G2 autoFit（height:100%），需显式定高祖先方能渲染。 */}
         <div style={{ height: 320 }}>
           <TrendChart />
         </div>

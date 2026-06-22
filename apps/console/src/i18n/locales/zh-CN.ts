@@ -47,7 +47,6 @@ const consoleZhCN = {
     orgRoles: '角色与权限',
     orgGroups: '用户组',
     // —— WP0 能力演示页（保留 · 不在 canonical 导航；仍被各 demo 页引用）——
-    dashboard: '数据大屏',
     lineage: '数据血缘',
     orchestration: 'DAG 编排',
     playground: '三开关 Demo',
@@ -233,11 +232,6 @@ const consoleZhCN = {
     colMembers: '成员数',
     colRoles: '绑定角色',
     colDesc: '描述',
-  },
-  dashboard: {
-    datasets: '数据集 / Datasets',
-    jobs: '作业 / Jobs',
-    quality: '质量达标 / Quality',
   },
 };
 

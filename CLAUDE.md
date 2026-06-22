@@ -42,7 +42,7 @@
 
 | App | 平面 | 受众 / 身份 | 对接后端 | 拓扑 |
 |--|--|--|--|--|
-| `apps/console` | **使用平面** · 租户控制台 | 租户用户（JWT 带 `tenant`，**org 作用域**） | governance / security / tools-bi / privacy / data-foundation | per-tenant / 按 org 多租户 |
+| `apps/console` | **使用平面** · 租户控制台 | 租户用户（JWT 带 `tenant`，**org 作用域**） | governance / security / privacy / data-foundation | per-tenant / 按 org 多租户 |
 | `apps/admin` | **管理平面** · 运营控制台 | 平台运营方（**跨租户 superadmin**，不绑 org） | 主要 `control-plane` | **跨租户单例**，独立域名 |
 
 开发须遵守的硬规则：
@@ -59,7 +59,7 @@
 
 ## 仓库定位
 
-平台**唯一前端仓**（其余 submodule 均为无界面后端服务）：使用平面控制台 + 数据大屏 + 可视化编排画布（`apps/console`）+ 管理平面运营控制台（`apps/admin`）。
+平台**唯一前端仓**（其余 submodule 均为无界面后端服务）：使用平面控制台 + 可视化编排画布（`apps/console`）+ 管理平面运营控制台（`apps/admin`）。
 
 技术栈**已定稿**（详见 `docs/00-前端初始化-spec.md`）：React 19 + TS(strict) + Vite SPA · **pnpm monorepo 双 app** · Ant Design v6 + ProComponents · AntV(X6/G6/G2/S2) · react-i18next · TanStack Query + Zustand · Keycloak OIDC · Storybook + Playwright(基于 Storybook) + Vitest。当前处脚手架阶段。
 

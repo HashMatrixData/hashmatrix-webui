@@ -2,7 +2,7 @@
   "name": "hashmatrix-webui",
   "version": "0.1.0",
   "private": true,
-  "description": "hashmatrix 数据中台统一前端控制台（WebUI / 数据大屏 / 可视化编排）",
+  "description": "hashmatrix 数据中台统一前端控制台（WebUI / 可视化编排）",
   "license": "Apache-2.0",
   "type": "module",
   "engines": {
