@@ -11,6 +11,7 @@ const consoleEnUS: ConsoleResources = {
     metamodel: 'Metamodel',
     relationship: 'Relationships',
     classification: 'Classifications',
+    templates: 'Templates',
   },
   demo: {
     title: 'Three-Switch Demo',
@@ -125,6 +126,16 @@ const consoleEnUS: ConsoleResources = {
       dependency: 'Dependency',
       association: 'Association',
     },
+  },
+  templates: {
+    mockBadge: 'Mock data · metamodel engine is post-M1',
+    pageDesc:
+      'One-click import of standard model families: MySQL / Hive / Kafka / REST. Imported as tenant-private drafts to refine and publish. The backend engine is under construction; data is mocked for now.',
+    includes: 'Includes metaclasses:',
+    cardImport: 'Import',
+    importConfirm: 'Import this template family ({{count}} metaclasses)? Existing codes will be skipped.',
+    importDone: 'Imported: {{created}} created, {{skipped}} skipped',
+    importFail: 'Import failed',
   },
   classification: {
     mockBadge: 'Mock data · metamodel engine is post-M1',

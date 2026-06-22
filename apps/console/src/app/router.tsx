@@ -32,6 +32,9 @@ const ClassificationPage = lazy(() =>
     default: m.ClassificationPage,
   })),
 );
+const TemplatesPage = lazy(() =>
+  import('@/modules/metadata/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +62,7 @@ export const router = createBrowserRouter([
           { path: 'metamodel', element: <MetamodelPage /> },
           { path: 'relationship', element: <RelationshipPage /> },
           { path: 'classification', element: <ClassificationPage /> },
+          { path: 'templates', element: <TemplatesPage /> },
         ],
       },
       {

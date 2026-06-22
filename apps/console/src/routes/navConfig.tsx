@@ -10,6 +10,7 @@ import {
   ApartmentOutlined,
   NodeIndexOutlined,
   TagsOutlined,
+  AppstoreAddOutlined,
 } from '@ant-design/icons';
 import { ROLES } from '@hashmatrix/sdk';
 
@@ -39,6 +40,7 @@ export const NAV_ITEMS: NavItem[] = [
       { path: '/metadata/metamodel', labelKey: 'menu.metamodel', icon: <ApartmentOutlined /> },
       { path: '/metadata/relationship', labelKey: 'menu.relationship', icon: <NodeIndexOutlined /> },
       { path: '/metadata/classification', labelKey: 'menu.classification', icon: <TagsOutlined /> },
+      { path: '/metadata/templates', labelKey: 'menu.templates', icon: <AppstoreAddOutlined /> },
     ],
   },
   {

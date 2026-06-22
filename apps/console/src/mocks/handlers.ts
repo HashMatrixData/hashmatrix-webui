@@ -4,6 +4,7 @@ import { TYPEDEFS, type TypeDef, type TypeDefInput } from './typedefs';
 import { TYPEDEF_VERSIONS, recordVersion, type TypeDefVersion } from './typedefVersions';
 import { RELATIONSHIPS } from './relationships';
 import { CLASSIFICATIONS, findClassification, type ClassificationNode } from './classifications';
+import { TEMPLATES } from './templates';
 
 /** mock「服务端」为新建元类派生的固定时间戳（确定性，便于 E2E）。 */
 const MOCK_CREATED_AT = '2026-06-22T00:00:00.000Z';
@@ -178,5 +179,31 @@ export const handlers = [
     };
     parent.children.push(created);
     return HttpResponse.json({ data: created, success: true }, { status: 201 });
+  }),
+
+  // 模板库列表（#11）：标准模型族。
+  http.get('*/api/meta/templates', () => {
+    return HttpResponse.json({ data: TEMPLATES, success: true });
+  }),
+
+  // 模板导入（#11）：批量建 typedef 落 TENANT/DRAFT；已存在的编码跳过，返回汇总。
+  http.post('*/api/meta/templates/:key/import', ({ params }) => {
+    const key = String(params.key);
+    const template = TEMPLATES.find((tpl) => tpl.key === key);
+    if (!template) {
+      return HttpResponse.json({ message: `模板不存在：${key}` }, { status: 404 });
+    }
+    let created = 0;
+    let skipped = 0;
+    // 隐式契约：模板内 typeDefs 须父类先于子类排列，使 superTypes 继承链在逐条建库时自洽。
+    for (const input of template.typeDefs) {
+      if (TYPEDEFS.some((d) => d.name === input.name)) {
+        skipped += 1;
+        continue;
+      }
+      TYPEDEFS.push({ ...input, scope: 'TENANT', status: 'DRAFT', version: 1, updatedAt: MOCK_CREATED_AT });
+      created += 1;
+    }
+    return HttpResponse.json({ data: { created, skipped, total: template.typeDefs.length }, success: true });
   }),
 ];

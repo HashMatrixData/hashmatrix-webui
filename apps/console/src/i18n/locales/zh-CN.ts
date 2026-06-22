@@ -10,6 +10,7 @@ const consoleZhCN = {
     metamodel: '元模型管理',
     relationship: '关系定义',
     classification: '分类树',
+    templates: '模板库',
   },
   demo: {
     title: '三开关 Demo',
@@ -122,6 +123,15 @@ const consoleZhCN = {
       dependency: '依赖',
       association: '关联',
     },
+  },
+  templates: {
+    mockBadge: 'Mock 数据 · 元模型引擎 post-M1',
+    pageDesc: '标准模型族一键导入：MySQL / Hive / Kafka / REST。导入后落租户私有草稿，可裁剪后再发布。后端引擎建设中，当前为 mock 数据。',
+    includes: '包含元类：',
+    cardImport: '导入',
+    importConfirm: '确认导入该模板族（共 {{count}} 个元类）？已存在的编码将跳过。',
+    importDone: '导入完成：新增 {{created}}，跳过 {{skipped}}',
+    importFail: '导入失败',
   },
   classification: {
     mockBadge: 'Mock 数据 · 元模型引擎 post-M1',
