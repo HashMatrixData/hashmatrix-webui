@@ -8,14 +8,8 @@ import {
   SafetyOutlined,
   DatabaseOutlined,
   ApartmentOutlined,
-  NodeIndexOutlined,
-  TagsOutlined,
-  AppstoreAddOutlined,
-  SafetyCertificateOutlined,
   TableOutlined,
-  ShareAltOutlined,
   ScanOutlined,
-  ThunderboltOutlined,
 } from '@ant-design/icons';
 import { ROLES } from '@hashmatrix/sdk';
 
@@ -42,15 +36,10 @@ export const NAV_ITEMS: NavItem[] = [
     icon: <DatabaseOutlined />,
     roles: [ROLES.GOVERNANCE_EDITOR, ROLES.ADMIN],
     children: [
-      { path: '/metadata/metamodel', labelKey: 'menu.metamodel', icon: <ApartmentOutlined /> },
-      { path: '/metadata/relationship', labelKey: 'menu.relationship', icon: <NodeIndexOutlined /> },
-      { path: '/metadata/classification', labelKey: 'menu.classification', icon: <TagsOutlined /> },
-      { path: '/metadata/templates', labelKey: 'menu.templates', icon: <AppstoreAddOutlined /> },
-      { path: '/metadata/validation', labelKey: 'menu.validation', icon: <SafetyCertificateOutlined /> },
-      { path: '/metadata/instance', labelKey: 'menu.instance', icon: <TableOutlined /> },
-      { path: '/metadata/lineage', labelKey: 'menu.metaLineage', icon: <ShareAltOutlined /> },
-      { path: '/metadata/collect', labelKey: 'menu.collect', icon: <ScanOutlined /> },
-      { path: '/metadata/events', labelKey: 'menu.events', icon: <ThunderboltOutlined /> },
+      // 9 个子模块归并为 3 个平面分组；各分组内用 Tab 承载原页面（IA 合并阶段1）。
+      { path: '/metadata/modeling', labelKey: 'menu.modeling', icon: <ApartmentOutlined /> },
+      { path: '/metadata/assets', labelKey: 'menu.assets', icon: <TableOutlined /> },
+      { path: '/metadata/ops', labelKey: 'menu.ops', icon: <ScanOutlined /> },
     ],
   },
   {

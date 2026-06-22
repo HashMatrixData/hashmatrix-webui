@@ -21,36 +21,15 @@ const DashboardPage = lazy(() =>
 const GovernancePage = lazy(() =>
   import('@/modules/governance/GovernancePage').then((m) => ({ default: m.GovernancePage })),
 );
-const MetamodelPage = lazy(() =>
-  import('@/modules/metadata/metamodel/MetamodelPage').then((m) => ({ default: m.MetamodelPage })),
+// 元数据管理 3 个平面分组（各内部用 Tab 承载原子页面，IA 合并阶段1）。
+const ModelingPage = lazy(() =>
+  import('@/modules/metadata/ModelingPage').then((m) => ({ default: m.ModelingPage })),
 );
-const RelationshipPage = lazy(() =>
-  import('@/modules/metadata/relationship/RelationshipPage').then((m) => ({ default: m.RelationshipPage })),
+const AssetsPage = lazy(() =>
+  import('@/modules/metadata/AssetsPage').then((m) => ({ default: m.AssetsPage })),
 );
-const ClassificationPage = lazy(() =>
-  import('@/modules/metadata/classification/ClassificationPage').then((m) => ({
-    default: m.ClassificationPage,
-  })),
-);
-const TemplatesPage = lazy(() =>
-  import('@/modules/metadata/templates/TemplatesPage').then((m) => ({ default: m.TemplatesPage })),
-);
-const ValidationPage = lazy(() =>
-  import('@/modules/metadata/validation/ValidationPage').then((m) => ({ default: m.ValidationPage })),
-);
-const InstancePage = lazy(() =>
-  import('@/modules/metadata/instance/InstancePage').then((m) => ({ default: m.InstancePage })),
-);
-const LineageAnalysisPage = lazy(() =>
-  import('@/modules/metadata/lineage/LineageAnalysisPage').then((m) => ({
-    default: m.LineageAnalysisPage,
-  })),
-);
-const CollectPage = lazy(() =>
-  import('@/modules/metadata/collect/CollectPage').then((m) => ({ default: m.CollectPage })),
-);
-const EventsPage = lazy(() =>
-  import('@/modules/metadata/events/EventsPage').then((m) => ({ default: m.EventsPage })),
+const OpsPage = lazy(() =>
+  import('@/modules/metadata/OpsPage').then((m) => ({ default: m.OpsPage })),
 );
 
 export const router = createBrowserRouter([
@@ -75,16 +54,10 @@ export const router = createBrowserRouter([
           </RequireRole>
         ),
         children: [
-          { index: true, element: <Navigate to="/metadata/metamodel" replace /> },
-          { path: 'metamodel', element: <MetamodelPage /> },
-          { path: 'relationship', element: <RelationshipPage /> },
-          { path: 'classification', element: <ClassificationPage /> },
-          { path: 'templates', element: <TemplatesPage /> },
-          { path: 'validation', element: <ValidationPage /> },
-          { path: 'instance', element: <InstancePage /> },
-          { path: 'lineage', element: <LineageAnalysisPage /> },
-          { path: 'collect', element: <CollectPage /> },
-          { path: 'events', element: <EventsPage /> },
+          { index: true, element: <Navigate to="/metadata/modeling" replace /> },
+          { path: 'modeling', element: <ModelingPage /> },
+          { path: 'assets', element: <AssetsPage /> },
+          { path: 'ops', element: <OpsPage /> },
         ],
       },
       {
