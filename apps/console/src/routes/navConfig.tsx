@@ -6,6 +6,8 @@ import {
   PartitionOutlined,
   FundOutlined,
   SafetyOutlined,
+  DatabaseOutlined,
+  ApartmentOutlined,
 } from '@ant-design/icons';
 import { ROLES } from '@hashmatrix/sdk';
 
@@ -17,6 +19,8 @@ export interface NavItem {
   icon: ReactNode;
   /** 路由级/菜单级所需角色（OR）。缺省 → 任何登录用户。 */
   roles?: readonly string[];
+  /** 子菜单（一层）：父项为容器，子项落实际页面。 */
+  children?: readonly NavItem[];
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -24,6 +28,15 @@ export const NAV_ITEMS: NavItem[] = [
   { path: '/lineage', labelKey: 'menu.lineage', icon: <DeploymentUnitOutlined /> },
   { path: '/orchestration', labelKey: 'menu.orchestration', icon: <PartitionOutlined /> },
   { path: '/dashboard', labelKey: 'menu.dashboard', icon: <FundOutlined /> },
+  {
+    path: '/metadata',
+    labelKey: 'menu.metadata',
+    icon: <DatabaseOutlined />,
+    roles: [ROLES.GOVERNANCE_EDITOR, ROLES.ADMIN],
+    children: [
+      { path: '/metadata/metamodel', labelKey: 'menu.metamodel', icon: <ApartmentOutlined /> },
+    ],
+  },
   {
     path: '/governance',
     labelKey: 'menu.governance',

@@ -26,7 +26,17 @@ export function AppLayout() {
   const visibleItems = NAV_ITEMS.filter((item) => can(item.roles ?? []));
   const route = {
     path: '/',
-    routes: visibleItems.map((item) => ({ path: item.path, name: t(item.labelKey), icon: item.icon })),
+    routes: visibleItems.map((item) => ({
+      path: item.path,
+      name: t(item.labelKey),
+      icon: item.icon,
+      // 一层子菜单：父项可继承父级角色门控（子项缺省随父）。
+      routes: item.children?.map((child) => ({
+        path: child.path,
+        name: t(child.labelKey),
+        icon: child.icon,
+      })),
+    })),
   };
 
   return (

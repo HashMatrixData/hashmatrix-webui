@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components -- 路由表模块：导出 lazy 组件与 router 单例，非 HMR 组件文件 */
 import { lazy } from 'react';
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom';
 import { AppLayout } from '@/layout/AppLayout';
 import { RequireAuth, RequireRole, ROLES } from '@hashmatrix/sdk';
 import { DEFAULT_ROUTE } from '@/routes/navConfig';
@@ -21,6 +21,9 @@ const DashboardPage = lazy(() =>
 const GovernancePage = lazy(() =>
   import('@/modules/governance/GovernancePage').then((m) => ({ default: m.GovernancePage })),
 );
+const MetamodelPage = lazy(() =>
+  import('@/modules/metadata/metamodel/MetamodelPage').then((m) => ({ default: m.MetamodelPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -36,6 +39,18 @@ export const router = createBrowserRouter([
       { path: 'lineage', element: <LineagePage /> },
       { path: 'orchestration', element: <OrchestrationPage /> },
       { path: 'dashboard', element: <DashboardPage /> },
+      {
+        path: 'metadata',
+        element: (
+          <RequireRole roles={[ROLES.GOVERNANCE_EDITOR, ROLES.ADMIN]}>
+            <Outlet />
+          </RequireRole>
+        ),
+        children: [
+          { index: true, element: <Navigate to="/metadata/metamodel" replace /> },
+          { path: 'metamodel', element: <MetamodelPage /> },
+        ],
+      },
       {
         path: 'governance',
         element: (
