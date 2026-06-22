@@ -24,6 +24,14 @@ const GovernancePage = lazy(() =>
 const MetamodelPage = lazy(() =>
   import('@/modules/metadata/metamodel/MetamodelPage').then((m) => ({ default: m.MetamodelPage })),
 );
+const RelationshipPage = lazy(() =>
+  import('@/modules/metadata/relationship/RelationshipPage').then((m) => ({ default: m.RelationshipPage })),
+);
+const ClassificationPage = lazy(() =>
+  import('@/modules/metadata/classification/ClassificationPage').then((m) => ({
+    default: m.ClassificationPage,
+  })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -49,6 +57,8 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="/metadata/metamodel" replace /> },
           { path: 'metamodel', element: <MetamodelPage /> },
+          { path: 'relationship', element: <RelationshipPage /> },
+          { path: 'classification', element: <ClassificationPage /> },
         ],
       },
       {

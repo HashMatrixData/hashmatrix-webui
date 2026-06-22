@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react';
 import { ProTable, type ActionType, type ProColumns } from '@ant-design/pro-components';
-import { Button, Tag, Typography } from 'antd';
+import { App, Button, Popconfirm, Tag, Typography } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { http } from '@hashmatrix/sdk';
+import { http, type ApiError } from '@hashmatrix/sdk';
 import type { TypeDef } from '@/mocks/typedefs';
 import {
   CATEGORY_COLOR,
@@ -15,6 +16,7 @@ import {
 } from './metamodelMeta';
 import { TypeDefDetailDrawer } from './TypeDefDetailDrawer';
 import { TypeDefFormDrawer } from './TypeDefFormDrawer';
+import { TypeDefVersionDrawer } from './TypeDefVersionDrawer';
 
 interface PagedResult {
   data: TypeDef[];
@@ -23,17 +25,21 @@ interface PagedResult {
 
 /**
  * 元类（TypeDef）清单：ProTable + 服务端分页/检索（keyword + category），
- * 行点击打开只读详情；工具栏新建 / 行内编辑（仅 TENANT，PLATFORM 共享只读 #10）。
+ * 行点击打开只读详情；工具栏新建 / 行内编辑·发布·版本（仅 TENANT 可改，PLATFORM 共享只读 #10）。
  * 数据经 axios → msw（story/E2E 自含）。
  */
 export function TypeDefTable() {
   const { t } = useTranslation();
+  const { message } = App.useApp();
+  const queryClient = useQueryClient();
   const actionRef = useRef<ActionType>(null);
   const [selected, setSelected] = useState<TypeDef | null>(null);
   const [open, setOpen] = useState(false);
   const [rows, setRows] = useState<TypeDef[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<TypeDef | null>(null);
+  const [versionName, setVersionName] = useState<string | null>(null);
+  const [versionOpen, setVersionOpen] = useState(false);
 
   const openCreate = () => {
     setEditing(null);
@@ -42,6 +48,21 @@ export function TypeDefTable() {
   const openEdit = (row: TypeDef) => {
     setEditing(row);
     setFormOpen(true);
+  };
+  const openVersions = (row: TypeDef) => {
+    setVersionName(row.name);
+    setVersionOpen(true);
+  };
+  const publish = async (row: TypeDef) => {
+    try {
+      await http.post(`/api/meta/typedefs/${row.name}/publish`);
+      message.success(t('metamodel.publishOk'));
+      actionRef.current?.reload();
+      // 版本历史已追加新记录，失活其缓存以便重开抽屉拿到最新时间线。
+      await queryClient.invalidateQueries({ queryKey: ['typedef-versions', row.name] });
+    } catch (err) {
+      message.error((err as ApiError).message || t('metamodel.publishFail'));
+    }
   };
 
   const columns: ProColumns<TypeDef>[] = [
@@ -107,27 +128,50 @@ export function TypeDefTable() {
     {
       title: t('metamodel.colActions'),
       valueType: 'option',
-      width: 90,
+      width: 170,
       fixed: 'right',
-      render: (_, row) =>
-        row.scope === 'TENANT'
-          ? [
-              // 行点击会打开详情，编辑须阻断冒泡。
-              <a
-                key="edit"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  openEdit(row);
-                }}
-              >
-                {t('metamodel.btnEdit')}
-              </a>,
-            ]
-          : [
-              <Typography.Text key="ro" type="secondary">
-                {t('metamodel.readonly')}
-              </Typography.Text>,
-            ],
+      // 行点击会打开详情，所有行内操作须 stopPropagation 阻断冒泡。
+      render: (_, row) => {
+        const actions =
+          row.scope === 'TENANT'
+            ? [
+                row.status === 'DRAFT' ? (
+                  <Popconfirm
+                    key="publish"
+                    title={t('metamodel.publishConfirm')}
+                    onConfirm={() => publish(row)}
+                  >
+                    <a onClick={(e) => e.stopPropagation()}>{t('metamodel.btnPublish')}</a>
+                  </Popconfirm>
+                ) : null,
+                <a
+                  key="edit"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEdit(row);
+                  }}
+                >
+                  {t('metamodel.btnEdit')}
+                </a>,
+              ]
+            : [
+                <Typography.Text key="ro" type="secondary">
+                  {t('metamodel.readonly')}
+                </Typography.Text>,
+              ];
+        actions.push(
+          <a
+            key="versions"
+            onClick={(e) => {
+              e.stopPropagation();
+              openVersions(row);
+            }}
+          >
+            {t('metamodel.btnVersions')}
+          </a>,
+        );
+        return actions;
+      },
     },
   ];
 
@@ -172,6 +216,11 @@ export function TypeDefTable() {
         superTypeOptions={rows.filter((r) => r.category === 'ENTITY').map((r) => r.name)}
         onOpenChange={setFormOpen}
         onSaved={() => actionRef.current?.reload()}
+      />
+      <TypeDefVersionDrawer
+        typeName={versionName}
+        open={versionOpen}
+        onClose={() => setVersionOpen(false)}
       />
     </>
   );

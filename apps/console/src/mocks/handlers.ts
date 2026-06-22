@@ -1,6 +1,9 @@
 import { http, HttpResponse } from 'msw';
 import { DATASETS } from './datasets';
 import { TYPEDEFS, type TypeDef, type TypeDefInput } from './typedefs';
+import { TYPEDEF_VERSIONS, recordVersion, type TypeDefVersion } from './typedefVersions';
+import { RELATIONSHIPS } from './relationships';
+import { CLASSIFICATIONS, findClassification, type ClassificationNode } from './classifications';
 
 /** mock「服务端」为新建元类派生的固定时间戳（确定性，便于 E2E）。 */
 const MOCK_CREATED_AT = '2026-06-22T00:00:00.000Z';
@@ -84,5 +87,96 @@ export const handlers = [
     };
     TYPEDEFS[idx] = updated;
     return HttpResponse.json({ data: updated, success: true });
+  }),
+
+  // 元类版本历史（#8）：返回 vN 变更记录；无记录则由当前态派生单条。
+  http.get('*/api/meta/typedefs/:name/versions', ({ params }) => {
+    const name = String(params.name);
+    const td = TYPEDEFS.find((d) => d.name === name);
+    const seeded = TYPEDEF_VERSIONS[name];
+    const data: TypeDefVersion[] =
+      seeded ??
+      (td
+        ? [{ version: td.version, status: td.status, changedAt: td.updatedAt, summary: '当前版本' }]
+        : []);
+    return HttpResponse.json({ data, success: true });
+  }),
+
+  // 元类发布（#8）：仅租户私有草稿可发布；平台公共只读→403，已发布→409。
+  http.post('*/api/meta/typedefs/:name/publish', ({ params }) => {
+    const name = String(params.name);
+    const idx = TYPEDEFS.findIndex((d) => d.name === name);
+    if (idx < 0) {
+      return HttpResponse.json({ message: `元类不存在：${name}` }, { status: 404 });
+    }
+    if (TYPEDEFS[idx].scope === 'PLATFORM') {
+      return HttpResponse.json({ message: '平台公共元模型共享只读，不可操作' }, { status: 403 });
+    }
+    if (TYPEDEFS[idx].status === 'PUBLISHED') {
+      return HttpResponse.json({ message: '该元类已发布' }, { status: 409 });
+    }
+    const published: TypeDef = { ...TYPEDEFS[idx], status: 'PUBLISHED', updatedAt: MOCK_CREATED_AT };
+    TYPEDEFS[idx] = published;
+    recordVersion(name, {
+      version: published.version,
+      status: 'PUBLISHED',
+      changedAt: MOCK_CREATED_AT,
+      summary: '发布草稿',
+    });
+    return HttpResponse.json({ data: published, success: true });
+  }),
+
+  // 关系定义检索（#7）：服务端分页 + keyword / relationshipType 过滤。
+  http.get('*/api/meta/relationships', ({ request }) => {
+    const url = new URL(request.url);
+    const current = Number(url.searchParams.get('current') ?? '1');
+    const pageSize = Number(url.searchParams.get('pageSize') ?? '10');
+    const keyword = (url.searchParams.get('keyword') ?? '').trim().toLowerCase();
+    const relationshipType = (url.searchParams.get('relationshipType') ?? '').trim();
+
+    const filtered = RELATIONSHIPS.filter((r) => {
+      const hitKeyword =
+        !keyword ||
+        r.name.toLowerCase().includes(keyword) ||
+        r.displayName.toLowerCase().includes(keyword);
+      const hitType = !relationshipType || r.relationshipType === relationshipType;
+      return hitKeyword && hitType;
+    });
+    const start = (current - 1) * pageSize;
+    const data = filtered.slice(start, start + pageSize);
+
+    return HttpResponse.json({ data, total: filtered.length, success: true });
+  }),
+
+  // 分类树读取（#6）：返回整棵树。
+  http.get('*/api/meta/classifications', () => {
+    return HttpResponse.json({ data: CLASSIFICATIONS, success: true });
+  }),
+
+  // 分类树扩展（#6/#10）：在指定父节点下新增 TENANT 私有子分类；同级编码唯一。
+  http.post('*/api/meta/classifications', async ({ request }) => {
+    const body = (await request.json()) as {
+      parentKey: string;
+      name: string;
+      displayName: string;
+      description?: string;
+    };
+    const parent = findClassification(CLASSIFICATIONS, body.parentKey);
+    if (!parent) {
+      return HttpResponse.json({ message: `父分类不存在：${body.parentKey}` }, { status: 404 });
+    }
+    parent.children ??= [];
+    if (parent.children.some((c) => c.name === body.name)) {
+      return HttpResponse.json({ message: `同级编码已存在：${body.name}` }, { status: 409 });
+    }
+    const created: ClassificationNode = {
+      key: `${parent.key}.${body.name}`,
+      name: body.name,
+      displayName: body.displayName,
+      scope: 'TENANT',
+      description: body.description,
+    };
+    parent.children.push(created);
+    return HttpResponse.json({ data: created, success: true }, { status: 201 });
   }),
 ];

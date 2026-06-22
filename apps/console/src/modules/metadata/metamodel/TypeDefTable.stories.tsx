@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { resetTypedefs } from '@/mocks/typedefs';
+import { resetTypedefVersions } from '@/mocks/typedefVersions';
 import { TypeDefTable } from './TypeDefTable';
 
 const meta: Meta<typeof TypeDefTable> = {
@@ -105,5 +106,31 @@ export const PlatformReadonly: Story = {
     const rowScope = within(row!);
     await expect(rowScope.getByText('只读')).toBeInTheDocument();
     await expect(rowScope.queryByText('编辑')).toBeNull();
+  },
+};
+
+/**
+ * 发布流程（#8）：租户私有草稿 BusinessTerm → 发布 → 状态转「已发布」。
+ */
+export const PublishFlow: Story = {
+  play: async ({ canvasElement }) => {
+    resetTypedefs();
+    resetTypedefVersions();
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+
+    // 草稿行渲染。
+    const draftRow = (await waitFor(async () => canvas.findByText('BusinessTerm'))).closest('tr')!;
+    await expect(within(draftRow).getByText('草稿')).toBeInTheDocument();
+
+    // 点「发布」→ Popconfirm 确认。
+    await userEvent.click(within(draftRow).getByText('发布'));
+    await userEvent.click(await body.findByRole('button', { name: /确定|确认/ }));
+
+    // reload 后该行状态转「已发布」（行 DOM 重建，重新按名定位）。
+    await waitFor(async () => {
+      const row = (await canvas.findByText('BusinessTerm')).closest('tr')!;
+      await expect(within(row).getByText('已发布')).toBeInTheDocument();
+    });
   },
 };
