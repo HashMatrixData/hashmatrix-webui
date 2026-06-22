@@ -185,7 +185,8 @@ export function MetamodelDesignerPage() {
         <Typography.Text type="secondary">{t('designer.toolbarHint')}</Typography.Text>
       </Space>
 
-      <Space align="start" size="middle" style={{ display: 'flex', width: '100%' }}>
+      {/* 用原生 flex 行（非 antd Space）：Space 会把子项包进 item，flex:1 不生效，画布列会塌成 0 宽。 */}
+      <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', width: '100%' }}>
         <Card styles={{ body: { padding: 0 } }} style={{ flex: 1, minWidth: 0 }}>
           <MetamodelCanvas
             typeDefs={typeDefs}
@@ -306,7 +307,7 @@ export function MetamodelDesignerPage() {
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('designer.selectHint')} />
           )}
         </Card>
-      </Space>
+      </div>
 
       <Card title={t('designer.classificationTitle')} size="small">
         <ClassificationTree />
