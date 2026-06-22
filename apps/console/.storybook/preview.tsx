@@ -1,7 +1,8 @@
 /* eslint-disable react-refresh/only-export-components -- Storybook 预览配置：默认导出 preview 配置而非组件 */
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { Preview } from '@storybook/react-vite';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { initialize, mswLoader } from 'msw-storybook-addon';
 import '@/index.css';
 import i18n from '@/i18n';
@@ -24,6 +25,11 @@ function StoryProviders({
   children: ReactNode;
 }) {
   const setMode = useThemeStore((s) => s.setMode);
+  // 每个 story 一个独立 QueryClient（避免 story 间缓存串扰）；retry: false 让错误态即时呈现
+  // （否则默认 retry=3 + 退避会拖慢异常态 story 至超时，如取数页 LoadError）。
+  const [queryClient] = useState(
+    () => new QueryClient({ defaultOptions: { queries: { retry: false } } }),
+  );
   useEffect(() => {
     setMode(theme);
   }, [theme, setMode]);
@@ -33,11 +39,13 @@ function StoryProviders({
 
   return (
     <MemoryRouter>
-      <MockSessionProvider>
-        <AppConfigProvider>
-          <div style={{ padding: 16 }}>{children}</div>
-        </AppConfigProvider>
-      </MockSessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <MockSessionProvider>
+          <AppConfigProvider>
+            <div style={{ padding: 16 }}>{children}</div>
+          </AppConfigProvider>
+        </MockSessionProvider>
+      </QueryClientProvider>
     </MemoryRouter>
   );
 }
