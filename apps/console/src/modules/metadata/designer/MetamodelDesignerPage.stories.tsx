@@ -56,3 +56,22 @@ export const Workspace: Story = {
     });
   },
 };
+
+/**
+ * 连线建继承模式（A1）：切「连线建继承」→ 画布进连线模式、提示更新。
+ * 注：X6 磁吸拖拽建边无法在 test-runner 稳定驱动，建边逻辑（写 superType + 环检测）
+ * 经隔离审查 + dev 手验；本 story 守护模式开关与画布连线配置不被破坏。
+ */
+export const ConnectMode: Story = {
+  play: async ({ canvasElement }) => {
+    resetTypedefs();
+    resetRelationships();
+    const canvas = within(canvasElement);
+
+    await waitFor(async () => canvas.findByText('数据资产基类'));
+    await userEvent.click(canvas.getByRole('button', { name: /连线建继承/ }));
+    await waitFor(async () => {
+      await expect(await canvas.findByText(/连线模式/)).toBeInTheDocument();
+    });
+  },
+};

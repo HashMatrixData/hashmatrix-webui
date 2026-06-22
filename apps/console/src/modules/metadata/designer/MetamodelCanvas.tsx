@@ -16,6 +16,10 @@ interface MetamodelCanvasProps {
   onSelectEdge?: (name: string) => void;
   /** 一致性校验命中的元类编码，红色高亮。 */
   problemIds?: string[];
+  /** 连线模式：开启后节点磁吸、可从子类拖到父类建继承（A1）。 */
+  connectMode?: boolean;
+  /** 连线完成回调（child 拖到 parent → 给 child 加 superType）。 */
+  onConnect?: (child: string, parent: string) => void;
   height?: number;
 }
 
@@ -72,6 +76,8 @@ export function MetamodelCanvas({
   onEditNode,
   onSelectEdge,
   problemIds,
+  connectMode = false,
+  onConnect,
   height = 460,
 }: MetamodelCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -96,9 +102,19 @@ export function MetamodelCanvas({
       autoResize: true,
       background: { color: bg },
       grid: { visible: true, type: 'dot', size: 12, args: { color: dark ? '#303030' : '#e8e8e8' } },
-      panning: true,
+      panning: !connectMode,
       mousewheel: { enabled: true, modifiers: ['ctrl', 'meta'] },
-      interacting: { nodeMovable: true },
+      // 连线模式：节点不可拖动（拖动用于拉边）；普通模式可拖动。
+      interacting: { nodeMovable: !connectMode },
+      connecting: {
+        allowBlank: false,
+        allowLoop: false,
+        allowMulti: false,
+        allowEdge: false,
+        // 仅允许节点→节点；拖到自身/重复由上面开关与回调侧再校验。
+        validateConnection: ({ sourceCell, targetCell }) =>
+          Boolean(sourceCell?.isNode() && targetCell?.isNode() && sourceCell !== targetCell),
+      },
     });
 
     const layout = computeLayout(typeDefs);
@@ -113,8 +129,16 @@ export function MetamodelCanvas({
         width: 168,
         height: 52,
         label: t.displayName,
+        // 连线模式下整个节点 body 作为磁吸源，可从节点拖出边。
         attrs: {
-          body: { fill: nodeFill, stroke: SCOPE_STROKE[t.scope], strokeWidth: 1.5, rx: 6, ry: 6 },
+          body: {
+            fill: nodeFill,
+            stroke: SCOPE_STROKE[t.scope],
+            strokeWidth: 1.5,
+            rx: 6,
+            ry: 6,
+            magnet: connectMode ? true : undefined,
+          },
           label: { fill: text, fontSize: 13 },
         },
       });
@@ -165,6 +189,17 @@ export function MetamodelCanvas({
         if (edge.id.startsWith(REL_EDGE_PREFIX)) onSelectEdge(edge.id.slice(REL_EDGE_PREFIX.length));
       });
     }
+    // 连线建继承：用户拖出新边 → child=源、parent=目标，回调写 superType；
+    // 临时边即刻移除（写成功后 invalidate→重建会按数据补上真正的继承边）。
+    if (connectMode && onConnect) {
+      graph.on('edge:connected', ({ edge, isNew }) => {
+        if (!isNew) return;
+        const child = edge.getSourceCellId();
+        const parent = edge.getTargetCellId();
+        graph.removeEdge(edge);
+        if (child && parent) onConnect(child, parent);
+      });
+    }
 
     graph.zoomToFit({ padding: 32, maxScale: 1 });
     graphRef.current = graph;
@@ -174,7 +209,7 @@ export function MetamodelCanvas({
       graphRef.current = null;
     };
     // accent/problemIds 不在此——选中与问题高亮属下一个 effect，不应触发整图重建。
-  }, [typeDefs, relationships, mode, onSelectNode, onEditNode, onSelectEdge]);
+  }, [typeDefs, relationships, mode, onSelectNode, onEditNode, onSelectEdge, connectMode, onConnect]);
 
   // 选中 + 问题高亮：就地改描边，不重建（保留用户的平移/缩放）。
   useEffect(() => {

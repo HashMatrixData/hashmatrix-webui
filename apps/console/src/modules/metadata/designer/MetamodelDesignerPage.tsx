@@ -14,7 +14,12 @@ import {
   Typography,
 } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { AppstoreAddOutlined, PlusOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import {
+  AppstoreAddOutlined,
+  NodeIndexOutlined,
+  PlusOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { http, type ApiError } from '@hashmatrix/sdk';
@@ -36,6 +41,7 @@ import { ClassificationTree } from '../classification/ClassificationTree';
 import { TemplatesPage } from '../templates/TemplatesPage';
 import { ValidationPage } from '../validation/ValidationPage';
 import { MetamodelCanvas } from './MetamodelCanvas';
+import { wouldFormInheritanceCycle } from './inheritanceGuard';
 
 interface Paged<T> {
   data: T[];
@@ -63,6 +69,7 @@ export function MetamodelDesignerPage() {
   const [validationOpen, setValidationOpen] = useState(false);
   const [versionName, setVersionName] = useState<string | null>(null);
   const [versionOpen, setVersionOpen] = useState(false);
+  const [connectMode, setConnectMode] = useState(false);
 
   const { data: typeDefs = [] } = useQuery({
     queryKey: TYPEDEFS_KEY,
@@ -155,6 +162,37 @@ export function MetamodelDesignerPage() {
     }
   };
 
+  // 拖拽连线建继承（A1）：child 拖到 parent → 给 child 加 superType。useCallback 稳定身份。
+  const handleConnect = useCallback(
+    async (child: string, parent: string) => {
+      const td = typeDefs.find((t) => t.name === child);
+      const parentTd = typeDefs.find((t) => t.name === parent);
+      if (!td || !parentTd) return;
+      if (td.scope === 'PLATFORM') return void message.error(t('metamodel.readonly'));
+      // 父子须同类别（与表单 superType 选项一致；不能让实体继承分类/关系元类）。
+      if (parentTd.category !== td.category) return void message.error(t('designer.inheritCategoryMismatch'));
+      if (td.superTypes.includes(parent)) return void message.info(t('designer.alreadySuper'));
+      if (wouldFormInheritanceCycle(typeDefs, child, parent)) {
+        return void message.error(t('designer.cycleBlocked'));
+      }
+      try {
+        await http.put(`/api/meta/typedefs/${child}`, {
+          name: td.name,
+          displayName: td.displayName,
+          category: td.category,
+          superTypes: [...td.superTypes, parent],
+          description: td.description,
+          attributeDefs: td.attributeDefs,
+        });
+        message.success(t('designer.inheritAdded'));
+        void queryClient.invalidateQueries({ queryKey: TYPEDEFS_KEY });
+      } catch (err) {
+        message.error((err as ApiError).message || t('designer.inheritFail'));
+      }
+    },
+    [typeDefs, message, t, queryClient],
+  );
+
   const attrColumns: TableColumnsType<AttributeDef> = [
     { title: t('metamodel.attrName'), dataIndex: 'name' },
     { title: t('metamodel.attrType'), dataIndex: 'type', width: 90, render: (v: string) => <Tag>{v}</Tag> },
@@ -179,10 +217,19 @@ export function MetamodelDesignerPage() {
         <Button icon={<SafetyCertificateOutlined />} onClick={() => void runValidate()}>
           {t('designer.toolbarValidate')}
         </Button>
+        <Button
+          icon={<NodeIndexOutlined />}
+          type={connectMode ? 'primary' : 'default'}
+          onClick={() => setConnectMode((v) => !v)}
+        >
+          {t('designer.toolbarConnect')}
+        </Button>
         <Tag color="blue">{t('designer.legendInherit')}</Tag>
         <Tag color="orange">{t('designer.legendRelation')}</Tag>
         {problemIds.length > 0 && <Tag color="red">{t('designer.legendProblem')}</Tag>}
-        <Typography.Text type="secondary">{t('designer.toolbarHint')}</Typography.Text>
+        <Typography.Text type="secondary">
+          {connectMode ? t('designer.connectHint') : t('designer.toolbarHint')}
+        </Typography.Text>
       </Space>
 
       {/* 用原生 flex 行（非 antd Space）：Space 会把子项包进 item，flex:1 不生效，画布列会塌成 0 宽。 */}
@@ -196,6 +243,8 @@ export function MetamodelDesignerPage() {
             onSelectEdge={handleSelectEdge}
             onEditNode={openEdit}
             problemIds={problemIds}
+            connectMode={connectMode}
+            onConnect={handleConnect}
           />
         </Card>
 
