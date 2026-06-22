@@ -1,4 +1,5 @@
 import type { ConsoleResources } from './zh-CN';
+import { metadataEnUS } from './metadata.en-US';
 
 const consoleEnUS: ConsoleResources = {
   menu: {
@@ -12,11 +13,16 @@ const consoleEnUS: ConsoleResources = {
     realtimeIntegration: 'Realtime Integration',
     dataArchitecture: 'Data Architecture',
     warehouseDesign: 'Warehouse Design',
+    dwLayer: 'Warehouse Layers',
+    dataDomain: 'Data Domains',
+    bizProcess: 'Business Processes',
+    bizCategory: 'Business Categories',
     dataStandard: 'Data Standards',
     modelDesign: 'Data Modeling',
     dwsDesigner: 'Summary Wide-Table Designer',
     adsDesigner: 'App Mart-Table Designer',
     dataIndicator: 'Data Indicators',
+    metadata: 'Metadata Management',
     dataDevelopment: 'Data Development',
     devWorkbench: 'Development Workbench',
     periodicTask: 'Periodic Tasks',
@@ -149,6 +155,50 @@ const consoleEnUS: ConsoleResources = {
     intro:
       'Warehouse-layered lineage (G6): the focused node border uses the brand accent; structural colors are fixed. Drag / zoom the canvas.',
   },
+  warehouseLayer: {
+    intro:
+      'Built on the OneData five layers (ODS/DIM/DWD/DWS/ADS): governs each layer’s mandatory prefix, default TTL lifecycle and default DQC template — inherited by the modeling gateway.',
+    searchPlaceholder: 'Search layer name / code',
+    addBtn: 'New Layer',
+    evoBtn: 'Layering Model',
+    configBtn: 'Configure',
+    kpiLayers: 'Layers',
+    kpiTables: 'Total Tables',
+    kpiPrefix: 'Prefix Coverage',
+    kpiStrict: 'Strict-DQC Layers',
+    tierSource: 'Source Layer',
+    tierCommon: 'Common Layer',
+    tierApp: 'Application Layer',
+    prefixLabel: 'Prefix',
+    ttlLabel: 'TTL',
+    dqcLabel: 'DQC',
+    tableCountLabel: 'Tables',
+    dqcLoose: 'Loose',
+    dqcStandard: 'Standard',
+    dqcStrict: 'Strict',
+    addTitle: 'New Warehouse Layer',
+    editTitle: 'Configure layer: {{name}}',
+    fldName: 'Layer Name',
+    fldCode: 'Layer Code',
+    fldPrefix: 'Physical Table Prefix',
+    fldPrefixHint: 'The build gateway validates layer ownership by this prefix; lowercase with trailing underscore, e.g. dwd_',
+    fldTtl: 'Default TTL Lifecycle',
+    fldDqc: 'Default DQC Template',
+    fldDesc: 'Description',
+    save: 'Save',
+    saved: 'Layer spec saved (mock)',
+    evoTitle: 'Lakehouse Layering & Storage Evolution',
+    evoIntro:
+      'Layers are governance lines of defense, not physical folders. The higher the layer, the stricter the checks and the higher the exposure risk — prefer delayed data over dirty data.',
+    evoOdsTitle: 'ODS · Dirty Data Allowed',
+    evoOdsBody: 'Mirrors the source as-is, no cleansing. Dirty data is allowed to preserve provenance, traceability and rollback; short TTL, buffer only.',
+    evoDwdTitle: 'DWD · Must Be Cleansed',
+    evoDwdBody: 'Atomic facts after cleansing, masking and dimension degradation; must conform to standards — one business process maps to one detail fact table.',
+    evoDwsTitle: 'DWS · Must Aggregate',
+    evoDwsBody: 'Common wide tables aggregated across periods by subject domain; reuse atomic-indicator calibers, no local measures.',
+    evoAdsTitle: 'ADS · Hard Block Outbound',
+    evoAdsBody: 'Result sets feeding reports / APIs / dashboards; blocked unless the DQC SLA passes — hard block on outbound consumption.',
+  },
   development: {
     intro: 'Data-development job orchestration (X6 DAG).',
     statusLegend:
@@ -240,6 +290,7 @@ const consoleEnUS: ConsoleResources = {
     colRoles: 'Bound Roles',
     colDesc: 'Description',
   },
+  ...metadataEnUS,
 };
 
 export default consoleEnUS;

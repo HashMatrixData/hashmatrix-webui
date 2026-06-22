@@ -5,6 +5,7 @@ import {
   ControlOutlined,
   SwapOutlined,
   BuildOutlined,
+  DatabaseOutlined,
   CodeOutlined,
   CheckCircleOutlined,
   FolderOpenOutlined,
@@ -75,12 +76,39 @@ export const NAV_ITEMS: NavItem[] = [
     labelKey: 'menu.dataArchitecture',
     icon: <BuildOutlined />,
     children: [
-      { path: '/standard/warehouse-design', labelKey: 'menu.warehouseDesign' },
+      // 数仓设计「页面刀」：L2 由占位叶子升为父级，落 canonical L3（集市已确认不做；
+      // 数仓分层↔分层管理去重合并为「数仓分层」单页；主题设计仅作分组、数据域/业务过程直接平铺）。
+      {
+        path: '/standard/warehouse-design',
+        labelKey: 'menu.warehouseDesign',
+        children: [
+          { path: '/standard/warehouse-design/layer', labelKey: 'menu.dwLayer' },
+          { path: '/standard/warehouse-design/domain', labelKey: 'menu.dataDomain' },
+          { path: '/standard/warehouse-design/process', labelKey: 'menu.bizProcess' },
+          { path: '/standard/warehouse-design/category', labelKey: 'menu.bizCategory' },
+        ],
+      },
       { path: '/standard/data-standard', labelKey: 'menu.dataStandard' },
       { path: '/standard/model-design', labelKey: 'menu.modelDesign' },
       { path: '/standard/model-design/dws-designer', labelKey: 'menu.dwsDesigner' },
       { path: '/standard/model-design/ads-designer', labelKey: 'menu.adsDesigner' },
       { path: '/standard/indicators', labelKey: 'menu.dataIndicator' },
+    ],
+  },
+
+  // 4b. 元数据管理（方案3 混合：独立 L1 · 元模型引擎之家。与数据架构平级——数据架构建标/建模
+  //    依赖本模块的 typedef+instance 引擎；未来抽为独立服务。子页由元数据会话增量接入，路径沿用现有
+  //    `/asset/metadata/*`·`/catalog/analysis` 真页接线（故不改 router）。其余子页（关系/分类/校验/
+  //    模板/实例/事件/元模型台账）由该会话陆续挂到本 L1。）
+  {
+    path: '/metadata',
+    labelKey: 'menu.metadata',
+    icon: <DatabaseOutlined />,
+    roles: [ROLES.GOVERNANCE_EDITOR, ROLES.ADMIN],
+    children: [
+      { path: '/asset/metadata/meta-model', labelKey: 'menu.metaModel' },
+      { path: '/asset/metadata/crawler', labelKey: 'menu.metadataCrawler' },
+      { path: '/catalog/analysis', labelKey: 'menu.catalogLineage' },
     ],
   },
 
@@ -108,17 +136,12 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
 
-  // 7. 数据目录
+  // 7. 数据目录（方案3：瘦身为「数据地图/检索」纯目录；元模型/采集/血缘已上移至「元数据管理」L1）。
   {
     path: '/data-catalog',
     labelKey: 'menu.dataCatalog',
     icon: <FolderOpenOutlined />,
-    children: [
-      { path: '/catalog/map', labelKey: 'menu.catalogMap' },
-      { path: '/catalog/analysis', labelKey: 'menu.catalogLineage' },
-      { path: '/asset/metadata/meta-model', labelKey: 'menu.metaModel' },
-      { path: '/asset/metadata/crawler', labelKey: 'menu.metadataCrawler' },
-    ],
+    children: [{ path: '/catalog/map', labelKey: 'menu.catalogMap' }],
   },
 
   // 8. 数据安全（分类分级/脱敏/水印/统一权限各自的 L3 后置）

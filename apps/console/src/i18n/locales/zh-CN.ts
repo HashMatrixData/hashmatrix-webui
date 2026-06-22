@@ -1,4 +1,6 @@
 /** console（使用平面）自有命名空间，叠加在 @hashmatrix/i18n 基线之上。 */
+import { metadataZhCN } from './metadata.zh-CN';
+
 const consoleZhCN = {
   menu: {
     // —— canonical 一级模块 L1（11）/ L2，与主仓 prototype sidebar 同源 ——
@@ -11,11 +13,16 @@ const consoleZhCN = {
     realtimeIntegration: '实时集成',
     dataArchitecture: '数据架构',
     warehouseDesign: '数仓设计',
+    dwLayer: '数仓分层',
+    dataDomain: '数据域',
+    bizProcess: '业务过程',
+    bizCategory: '业务分类',
     dataStandard: '数据标准',
     modelDesign: '数据建模',
     dwsDesigner: '汇总宽表设计器',
     adsDesigner: '应用集市表设计器',
     dataIndicator: '数据指标',
+    metadata: '元数据管理',
     dataDevelopment: '数据开发',
     devWorkbench: '数据开发',
     periodicTask: '周期任务',
@@ -144,6 +151,50 @@ const consoleZhCN = {
   architecture: {
     intro: '数仓分层血缘（G6）：聚焦节点描边取品牌强调色，结构色固定。可拖拽 / 缩放画布。',
   },
+  warehouseLayer: {
+    intro:
+      '以 OneData 五层（ODS/DIM/DWD/DWS/ADS）为骨架，统一治理各层强制前缀、默认 TTL 生命周期与默认 DQC 质检模板，供建模网关继承。',
+    searchPlaceholder: '搜索分层名称 / 编码',
+    addBtn: '新增分层',
+    evoBtn: '分层演进模型',
+    configBtn: '配置',
+    kpiLayers: '分层数',
+    kpiTables: '全仓表资产',
+    kpiPrefix: '强制前缀覆盖',
+    kpiStrict: '严格 DQC 层数',
+    tierSource: '贴源层',
+    tierCommon: '公共层',
+    tierApp: '应用层',
+    prefixLabel: '前缀',
+    ttlLabel: 'TTL',
+    dqcLabel: 'DQC',
+    tableCountLabel: '表资产',
+    dqcLoose: '宽松',
+    dqcStandard: '标准',
+    dqcStrict: '严格',
+    addTitle: '新增数仓分层',
+    editTitle: '配置分层规范：{{name}}',
+    fldName: '分层名称',
+    fldCode: '分层编码',
+    fldPrefix: '物理表名前缀',
+    fldPrefixHint: '建表网关据此校验分层归属，建议小写下划线结尾，如 dwd_',
+    fldTtl: '默认生命周期 TTL',
+    fldDqc: '默认 DQC 质检模板',
+    fldDesc: '分层描述',
+    save: '保存配置',
+    saved: '分层规范已保存（mock）',
+    evoTitle: '湖仓分层与存储演进模型',
+    evoIntro:
+      '分层不是物理目录，而是一道道治理防线。越往上层，质检越严苛、对外暴露风险越高——宁可数据延迟，绝不出脏水。',
+    evoOdsTitle: 'ODS 贴源层 · 允许脏数据',
+    evoOdsBody: '原样镜像业务库，不做清洗。允许脏数据以保留现场、可追溯、可回滚；TTL 短，仅作中转缓冲。',
+    evoDwdTitle: 'DWD 明细层 · 必须清洗',
+    evoDwdBody: '清洗、脱敏、维度退化后的原子事实；必须落标，一个业务过程对应一张明细事实表。',
+    evoDwsTitle: 'DWS 汇总层 · 必须降维聚合',
+    evoDwsBody: '按主题域多周期降维聚合的公共宽表；复用原子指标口径，禁止本地新建度量。',
+    evoAdsTitle: 'ADS 应用层 · 对外强阻断',
+    evoAdsBody: '直供报表 / API / 大屏的结果集；未过 DQC SLA 不放行，对外消费强阻断。',
+  },
   development: {
     intro: '数据开发作业编排（X6 DAG）。',
     statusLegend: '状态色固定（成功 / 运行中 / 失败）；选中任务描边随品牌强调色。',
@@ -233,6 +284,8 @@ const consoleZhCN = {
     colRoles: '绑定角色',
     colDesc: '描述',
   },
+  // 元数据管理各子模块命名空间（自成一文件，见 metadata.zh-CN.ts）。
+  ...metadataZhCN,
 };
 
 export default consoleZhCN;
