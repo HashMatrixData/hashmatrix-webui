@@ -30,7 +30,15 @@ export const Default: Story = {
 
     const importOnce = async () => {
       await userEvent.click(cardScope.getByRole('button', { name: /导入/ }));
-      await userEvent.click(await body.findByRole('button', { name: /确定|确认/ }));
+      // antd Popconfirm 确认按钮在两 CJK 字间插空格，按名匹配不稳，按类名取主按钮。
+      const ok = await waitFor(() => {
+        const btn = canvasElement.ownerDocument.querySelector<HTMLElement>(
+          '.ant-popconfirm-buttons .ant-btn-primary',
+        );
+        if (!btn) throw new Error('popconfirm ok button not found');
+        return btn;
+      });
+      await userEvent.click(ok);
     };
 
     // 首次导入：mock 新增 3 个元类（mysql_database/table/column）。

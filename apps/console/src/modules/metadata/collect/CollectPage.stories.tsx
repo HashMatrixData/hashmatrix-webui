@@ -25,8 +25,9 @@ export const Default: Story = {
     const runRow = (await waitFor(async () => canvas.findByText('run_0002'))).closest('tr')!;
     await userEvent.click(runRow);
     const dialog = await body.findByRole('dialog');
+    // 断言异动类型标签（唯一）；dwd.tmp_* 在变更集与异动两处出现，不可作锚点。
     await waitFor(async () => {
-      await expect(await within(dialog).findByText('dwd.tmp_*')).toBeInTheDocument();
+      await expect(await within(dialog).findByText('批量删表')).toBeInTheDocument();
     });
   },
 };
