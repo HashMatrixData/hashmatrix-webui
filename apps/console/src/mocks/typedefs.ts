@@ -33,6 +33,19 @@ export type TypeStatus = 'DRAFT' | 'PUBLISHED';
 /** 作用域（Epic #10）：平台公共（共享只读）/ 租户私有（可扩展）。 */
 export type TypeScope = 'PLATFORM' | 'TENANT';
 
+/**
+ * 元类可编辑输入（新建/编辑表单提交体）：
+ * 作用域/状态/版本/时间由「服务端」派生，不由前端提交（#10 作用域 / #8 生命周期）。
+ */
+export interface TypeDefInput {
+  name: string;
+  displayName: string;
+  category: TypeCategory;
+  superTypes: string[];
+  description?: string;
+  attributeDefs: AttributeDef[];
+}
+
 /** 元类（TypeDef）：可继承的元模型定义单元。 */
 export interface TypeDef {
   /** 唯一编码（Epic #9「编码唯一」）。 */
@@ -55,7 +68,7 @@ export interface TypeDef {
  * 确定性 mock 元模型族（无随机）：一条平台公共基类 + 三个继承子类，
  * 外加分类、关系与一条租户私有草稿，覆盖继承/基数/作用域/状态各维度。
  */
-export const TYPEDEFS: TypeDef[] = [
+const INITIAL_TYPEDEFS: TypeDef[] = [
   {
     name: 'DataAsset',
     displayName: '数据资产基类',
@@ -163,3 +176,16 @@ export const TYPEDEFS: TypeDef[] = [
     ],
   },
 ];
+
+/**
+ * 可变工作副本：mock 写接口（POST/PUT）就地变更本数组。
+ * 注意：模块级状态在「整页导航」时随模块重求值复位（test-runner 每 story 一次），
+ * 但在 `storybook dev` 交互态切换 story **不会**复位——故交互测试须在 play 起始
+ * 调 `resetTypedefs()` 保证确定性与可重复性。
+ */
+export const TYPEDEFS: TypeDef[] = [...INITIAL_TYPEDEFS];
+
+/** 还原 mock 元类到初始种子（供 story play 起始调用，保证每次运行隔离）。 */
+export function resetTypedefs(): void {
+  TYPEDEFS.splice(0, TYPEDEFS.length, ...INITIAL_TYPEDEFS);
+}
