@@ -13,9 +13,11 @@ bootstrapBrand();
 /**
  * 开发态启用 msw mock（动态 import，生产构建经 tree-shaking 不打包）。
  * 后端未就绪期间让全站（canonical 真页 + 元数据管理）在无后端环境下跑通 mock 供数。
+ * 接真实后端/网关联调时（如 M1 I3/I4 纵切链）以 `VITE_MSW=off pnpm dev` 关闭，无需改码。
  */
 async function enableMocking(): Promise<void> {
   if (!import.meta.env.DEV) return;
+  if (import.meta.env.VITE_MSW === 'off') return;
   const { worker } = await import('@/mocks/browser');
   await worker.start({ onUnhandledRequest: 'bypass' });
 }
