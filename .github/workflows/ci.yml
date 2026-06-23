@@ -59,3 +59,55 @@ jobs:
 
       - name: E2E (Playwright on Storybook)
         run: pnpm --filter @hashmatrix/${{ matrix.app }} test-storybook:ci
+
+  # console 镜像 → ghcr（M1 · I3 T1：webui 进集群的前置——主仓 deploy/charts/webui 拉本镜像）。
+  # admin 镜像后置（webui #3 · post-M1），届时复制本 job 改 console→admin。
+  image-console:
+    name: 构建并发布 console 镜像（ghcr）
+    needs: app                # 质量门：console/admin 全绿后才出包，不发布构建不过的镜像
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write         # 仅本 job 提权写 ghcr（最小权限；write 含 read，docker build 复用缓存）
+    steps:
+      - uses: actions/checkout@v4
+
+      # 双 tag（平台发布契约 AD，主仓 docs/architecture/04 §4）：
+      #   · 移动 :<版本>（dev 期 :0.1.0）——随 main 覆盖，对齐 deploy/charts/webui/values.yaml 的 tag；
+      #   · 不可变 :<版本>-<short-sha>——可追溯到具体提交，部署可 pin。
+      # 镜像名对齐主仓 deploy/values（ghcr.io/hashmatrixdata/webui-console）；ghcr owner 须全小写。
+      # 注：本镜像为官方 nginx:1.27-alpine（root + 绑特权口 80），主仓 chart 有意不设 runAsNonRoot
+      #     （localdev PSA=baseline）；非 root 硬化（nginx-unprivileged + :8080）列 post-M1，故此处
+      #     不套后端 JVM 镜像的「非零数字 uid」守护（见 deploy/charts/webui/README）。
+      - name: 计算镜像名与 tag
+        id: meta
+        run: |
+          VERSION=$(jq -r '.version' package.json)
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then echo "::error::无法解析 package.json version"; exit 1; fi
+          OWNER=$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')
+          SHA="${GITHUB_SHA::7}"
+          echo "image=ghcr.io/${OWNER}/webui-console" >> "$GITHUB_OUTPUT"
+          echo "moving=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "immutable=${VERSION}-${SHA}" >> "$GITHUB_OUTPUT"
+          echo "镜像：ghcr.io/${OWNER}/webui-console · 移动 :${VERSION} · 不可变 :${VERSION}-${SHA}"
+
+      # 仅 push 到 main 时登录并发布；PR 只 build 验证 Dockerfile，不写 registry（避免污染）。
+      - name: 登录 ghcr
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 构建上下文为仓库根（services/webui）；Dockerfile COPY . . 后 pnpm 构建 console 静态产物。
+      # PR：仅 build 验证 Dockerfile；push 到 main：build 后推双 tag。
+      - name: 构建并（push 时）发布镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: deploy/console/Dockerfile
+          push: ${{ github.event_name == 'push' }}
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.moving }}
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.immutable }}
