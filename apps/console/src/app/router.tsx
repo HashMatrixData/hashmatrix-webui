@@ -69,6 +69,29 @@ const GroupsPage = lazy(() =>
   import('@/modules/org/groups/GroupsPage').then((m) => ({ default: m.GroupsPage })),
 );
 
+// 元数据管理（governance 元模型引擎 · mock-first）：设计器 / 采集 / 血缘 接 canonical 叶子。
+const MetamodelDesignerPage = lazy(() =>
+  import('@/modules/metadata/designer/MetamodelDesignerPage').then((m) => ({
+    default: m.MetamodelDesignerPage,
+  })),
+);
+const CollectPage = lazy(() =>
+  import('@/modules/metadata/collect/CollectPage').then((m) => ({ default: m.CollectPage })),
+);
+const LineageAnalysisPage = lazy(() =>
+  import('@/modules/metadata/lineage/LineageAnalysisPage').then((m) => ({
+    default: m.LineageAnalysisPage,
+  })),
+);
+
+// 数据架构「页面刀」· 数仓设计：数仓分层（OneData 五层治理）落 L3 首叶。`/standard/warehouse-design`
+// 经 navConfig 升为父级 → parentRedirects 自动重定向至本叶；原 `warehouse-design` map 项变死项无害。
+const WarehouseLayerPage = lazy(() =>
+  import('@/modules/data-architecture/warehouse/WarehouseLayerPage').then((m) => ({
+    default: m.WarehouseLayerPage,
+  })),
+);
+
 /** canonical 叶子路径 → 真页（覆盖默认 ModulePlaceholder）。后续页面刀按此 map 增量接入。 */
 const REAL_PAGE_BY_PATH: Record<string, ReactNode> = {
   // #11 数据生产链
@@ -86,6 +109,12 @@ const REAL_PAGE_BY_PATH: Record<string, ReactNode> = {
   '/settings/users': <MembersPage />,
   '/settings/roles': <RolesPage />,
   '/settings/user-groups': <GroupsPage />,
+  // 数据架构 · 数仓设计：数仓分层（OneData 五层）。
+  '/standard/warehouse-design/layer': <WarehouseLayerPage />,
+  // 元数据管理：元模型设计器（画布工作台）/ 采集中心 / 血缘与影响分析。
+  '/asset/metadata/meta-model': <MetamodelDesignerPage />,
+  '/asset/metadata/crawler': <CollectPage />,
+  '/catalog/analysis': <LineageAnalysisPage />,
 };
 
 const demoRoutes: RouteObject[] = [
