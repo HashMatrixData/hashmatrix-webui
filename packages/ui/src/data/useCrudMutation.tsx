@@ -57,6 +57,8 @@ export function useCrudMutation<TValues, TResult = unknown>(
       setFailed(false);
     } catch (err) {
       // 吞掉异常以降级为错误 Alert（不阻断 UI），但仍记录细节——否则真后端接入期失败仅剩通用文案、不可诊断。
+      // 注（D7）：此处记录的 `err` 须为已归一化的错误（sdk 响应拦截器产出 `{status,message}`，不含请求体），
+      // 故敏感载荷（如数据源 password）不会随日志外泄；若改为记录 axios 原始 error，务必先剥离 config.data。
       console.error('[useCrudMutation] 提交失败', err);
       setFailed(true);
     } finally {
