@@ -6,7 +6,7 @@ import { MY_TENANTS } from './tenants';
 import { ORG_MEMBERS } from './orgMembers';
 import { ORG_ROLES } from './orgRoles';
 import { ORG_GROUPS } from './orgGroups';
-import { dataSources, addDataSource } from './dataSources';
+import { dataSources, addDataSource, DEMO_TABLES, previewFor } from './dataSources';
 
 /** 服务端分页 + 按 name 模糊过滤（呼应大数据量表格策略）。 */
 function paginate<T extends { name: string }>(rows: T[], url: URL) {
@@ -38,6 +38,12 @@ export const handlers = [
     return HttpResponse.json(addDataSource(safe));
   }),
   http.post('*/api/datasources/test', () => HttpResponse.json({ ok: true })),
+  // 浏览流（#29）：库表清单 + 选表预览前 N 行（脱敏 demo；空/错态由 story 覆盖）。
+  http.get('*/api/datasources/:id/tables', () => HttpResponse.json(DEMO_TABLES)),
+  http.post('*/api/datasources/:id/preview', async ({ request }) => {
+    const { table, limit } = (await request.json()) as { table: string; limit?: number };
+    return HttpResponse.json(previewFor(table, limit));
+  }),
   http.get('*/api/quality-rules', ({ request }) =>
     HttpResponse.json(paginate(QUALITY_RULES, new URL(request.url))),
   ),
