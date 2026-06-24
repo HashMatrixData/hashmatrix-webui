@@ -1,16 +1,25 @@
+import { useState, type ReactNode } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { http, HttpResponse } from 'msw';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { IntegrationPage } from './IntegrationPage';
 import { emptyList, errorList } from '@/mocks/testHandlers';
 import { resetDataSources } from '@/mocks/dataSources';
 
 const DS_API = '*/api/datasources';
 
+// 详情抽屉用 TanStack Query，preview 未装配 QueryClientProvider——按 story 全新 client。
+function QueryDecorator({ children }: { children: ReactNode }) {
+  const [client] = useState(() => new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } }));
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+}
+
 const meta: Meta<typeof IntegrationPage> = {
   title: 'Pages/Integration (数据源接入)',
   component: IntegrationPage,
   parameters: { layout: 'fullscreen' },
+  decorators: [(Story) => <QueryDecorator><Story /></QueryDecorator>],
   // 每个 story 渲染前复位数据源 store，保证起点确定（与全局 mswLoader 组合）。
   loaders: [
     async () => {
@@ -97,6 +106,20 @@ export const TestConnectionOk: Story = {
     await fillForm();
     await userEvent.click(body.getByRole('button', { name: /测试连接/ }));
     await expect(await body.findByText('连接成功')).toBeInTheDocument();
+  },
+};
+
+/** 浏览流·打开详情：点首行「查看库表」→ 详情抽屉库表树渲染（#29 与列表的接线）。 */
+export const OpenDetail: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(document.body);
+    await waitFor(async () => {
+      await expect(await canvas.findByText('acme_mysql_demo_1')).toBeInTheDocument();
+    });
+    const links = await canvas.findAllByText('查看库表');
+    await userEvent.click(links[0]);
+    await expect(await body.findByText('orders_demo')).toBeInTheDocument();
   },
 };
 

@@ -17,6 +17,7 @@ import {
   type DataSourceInput,
   type DataSourceRow,
 } from '@/api/dataSources';
+import { DataSourceDetailDrawer } from './DataSourceDetailDrawer';
 
 /** 连接态 → Badge 状态色（固定语义色，不随品牌换肤，守 D3）+ i18n key（缺省按 unknown）。 */
 const STATUS_BADGE: Record<
@@ -43,6 +44,10 @@ export function IntegrationPage() {
   // 测试连接：独立于提交，回显 ok / 真实错误（不抛、内联 Alert 与提交错误风格一致）。
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<{ ok: boolean; error?: string } | null>(null);
+
+  // 浏览流（#29）：行内「查看库表」打开详情抽屉（库表树 + 选表预览）。
+  const [detailDS, setDetailDS] = useState<DataSourceRow | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const { request, errorNode } = useTableRequest<DataSourceRow>(listDataSources, t('common.loadError'));
 
@@ -85,6 +90,23 @@ export function IntegrationPage() {
         const meta = STATUS_BADGE[row.status ?? 'unknown'];
         return <Badge status={meta.status} text={t(meta.labelKey)} />;
       },
+    },
+    {
+      title: t('integration.colAction'),
+      valueType: 'option',
+      key: 'option',
+      width: 120,
+      render: (_, row) => [
+        <a
+          key="browse"
+          onClick={() => {
+            setDetailDS(row);
+            setDetailOpen(true);
+          }}
+        >
+          {t('integration.viewAction')}
+        </a>,
+      ],
     },
   ];
 
@@ -190,6 +212,13 @@ export function IntegrationPage() {
             ))}
         </Space>
       </CrudDrawerForm>
+
+      <DataSourceDetailDrawer
+        key={detailDS?.id}
+        open={detailOpen}
+        dataSource={detailDS}
+        onClose={() => setDetailOpen(false)}
+      />
     </>
   );
 }

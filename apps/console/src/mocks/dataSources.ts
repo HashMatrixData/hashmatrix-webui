@@ -1,4 +1,4 @@
-import type { DataSourceInput, DataSourceRow } from '@/api/dataSources';
+import type { DataSourceInput, DataSourceRow, DataSourceTable, TablePreview } from '@/api/dataSources';
 
 /**
  * 数据源 mock 数据（M2 链① · msw-first）。脱敏：虚构占位 `acme` / `example.com`，无真实业务数据。
@@ -48,4 +48,24 @@ export const addDataSource = (input: Omit<DataSourceInput, 'password'>): DataSou
   };
   store = [row, ...store];
   return row;
+};
+
+// —— #29 浏览流：库表 + 预览（脱敏 demo；与 store 解耦，所有 demo 数据源共用同一组示例库表）——
+
+/** demo 库表清单（虚构脱敏表名）。 */
+export const DEMO_TABLES: DataSourceTable[] = [
+  { name: 'orders_demo' },
+  { name: 'customers_demo' },
+  { name: 'products_demo' },
+];
+
+/** 某表的前 N 行预览（确定性派生，无随机；列固定 id/name/created_at，值含表名以便断言）。 */
+export const previewFor = (table: string, limit = 20): TablePreview => {
+  const columns = ['id', 'name', 'created_at'];
+  const rows = Array.from({ length: Math.min(limit, 5) }, (_, i) => ({
+    id: i + 1,
+    name: `${table}_row_${i + 1}`,
+    created_at: `2026-03-${String((i % 28) + 1).padStart(2, '0')}`,
+  }));
+  return { columns, rows };
 };

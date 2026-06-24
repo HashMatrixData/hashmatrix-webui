@@ -49,6 +49,18 @@ export interface TestConnectionResult {
   error?: string;
 }
 
+/** 库表项（#29 浏览流 · tolerant：`schema` 可缺省，单库方言只用 `name`）。 */
+export interface DataSourceTable {
+  name: string;
+  schema?: string;
+}
+
+/** 表数据预览（前 N 行 · 动态列）。`rows` 按 `columns` 顺序取值，tolerant 接受任意单元类型。 */
+export interface TablePreview {
+  columns: string[];
+  rows: Array<Record<string, unknown>>;
+}
+
 /** 列表（按 `X-Tenant-Id` 隔离 · 服务端分页，形 `{ data, total }`）。 */
 export const listDataSources = (params: Record<string, unknown>) =>
   http.get<Paged<DataSourceRow>>('/api/datasources', { params }).then((r) => r.data);
@@ -60,3 +72,11 @@ export const createDataSource = (input: DataSourceInput) =>
 /** 测试连接（真连 demo 数据源；连不上返回 `{ ok:false, error }`）。 */
 export const testDataSourceConnection = (input: DataSourceInput) =>
   http.post<TestConnectionResult>('/api/datasources/test', input).then((r) => r.data);
+
+/** 列出数据源的库表（#29 · 按 `X-Tenant-Id` 隔离；契约 `GET /{id}/tables`）。 */
+export const listDataSourceTables = (id: string) =>
+  http.get<DataSourceTable[]>(`/api/datasources/${id}/tables`).then((r) => r.data);
+
+/** 预览某表前 N 行（契约 `POST /{id}/preview`，`limit` 限行；只读取数，不落库）。 */
+export const previewDataSourceTable = (id: string, table: string, limit = 20) =>
+  http.post<TablePreview>(`/api/datasources/${id}/preview`, { table, limit }).then((r) => r.data);

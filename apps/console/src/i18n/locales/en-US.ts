@@ -155,6 +155,15 @@ const consoleEnUS: ConsoleResources = {
     statusError: 'Error',
     statusUnknown: 'Unknown',
     submitError: 'Save failed, please try again',
+    colAction: 'Actions',
+    viewAction: 'Browse Tables',
+    detailTitle: 'Tables & Preview',
+    treeTitle: 'Tables',
+    previewTitle: 'Preview (first N rows)',
+    selectTableHint: 'Select a table on the left to preview',
+    tablesError: 'Failed to load tables',
+    previewError: 'Failed to load preview',
+    emptyTables: 'No tables',
   },
   architecture: {
     intro:
